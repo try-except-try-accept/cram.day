@@ -24,66 +24,71 @@
 </head>
 <body>
 
-<h1>Fill The Gaps</h1>
+    <header>
+        <h1>Fill The Gaps</h1>
+    </header>
 
 
+    <div class="container-fluid">
 
-<div class="container-fluid">
-
-    <div id="quiz">
+        <div id="quiz">
 
 
-            {{ question }}
+                <div id="question"></div>
+                <div id="feedback"></div>
 
-            <button id="hint_button" onclick="get_hints">Show hints</button>
-            <button id="check_button" onclick="check_answer">Check</button>
+                <div id="config">
+                    <button id="hint_button" onclick="get_hints();">Show hints</button>
+                    <button id="check_button" onclick="submit_answer();">Check</button>
 
-            <label for="course">Select course:</label>
-            <select name="course" id="course">
-              <option value="igcse">Oxford AQA IGCSE</option>
-              <option value="a2">CIE A2 Level</option>
-              <option value="as">CIE AS Level</option>
-            </select>
+                    <label for="course">Select course:</label>
+                    <select name="course" id="course">
+                      <option value="igcse">Oxford AQA IGCSE</option>
+                      <option value="a2">CIE A2 Level</option>
+                      <option value="as">CIE AS Level</option>
+                    </select>
 
-            <button id="choose_button" onclick="get_topic_list();"  class="btn btn-warning" class="buttonStyle"
-                                data-toggle="modal" data-target="#choose_topics_modal">
-                Choose topics
-            </button>
+                    <button id="choose_button" onclick="get_topic_list();"  class="btn btn-warning" class="buttonStyle"
+                                        data-toggle="modal" data-target="#choose_topics_modal">
+                        Choose topics
+                    </button>
 
+                </div>
+
+
+        </div>
 
     </div>
-
-</div>
-<div id="choose_topics_modal" class="modal fade" role="dialog">
-    <div class="choose_topics_modal modal-dialog">
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div id="choose_topics_modal_header" class="modal-header">
-                <h4 class="modal-title">Report Problem</h4>
-            </div>
+    <div id="choose_topics_modal" class="modal fade" role="dialog">
+        <div class="choose_topics_modal modal-dialog modal-lg">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div id="choose_topics_modal_header" class="modal-header">
+                    <h4 class="modal-title">Choose topics:</h4>
+                </div>
 
 
-            <div id="choose_topics_modal_content" class="modal-body">
+                <div id="choose_topics_modal_content" class="modal-body">
 
-                <form id="topic_chooser">
-
-
-                    <div id="topic_checkbox_display">
+                    <form id="topic_chooser">
 
 
-                    </div>
+                        <div id="topic_checkbox_display">
 
-                </form>
 
-            </div>
+                        </div>
 
-            <div class="modal-footer">
-                <input type="submit" onclick="get_data();" data-toggle="modal" class="btn btn-success"
-                       id="get_data_btn" value="Submit"/>
+                    </form>
+
+                </div>
+
+                <div class="modal-footer">
+                    <input type="submit" onclick="get_question();" data-toggle="modal" class="btn btn-success"
+                           id="get_question_btn" value="Submit"/>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
 
 

@@ -1,0 +1,54 @@
+
+
+.hint
+{
+    position:absolute;
+}
+
+
+
+header
+{
+    position:absolute;
+    left:0;
+    top:50px;
+}
+
+
+#feedback, #question
+{
+    position:absolute;
+    left:0;
+    top:200px;
+}
+
+#config
+{
+    position:absolute;
+    left:0;
+    top:400px;
+}
+
+
+#question
+{
+    z-index:-1;
+}
+
+#feedback
+{
+    display:none;
+    z-index:1;
+    opacity:1;
+}
+
+.correct
+{
+    background-color:#4BB543;
+    color:white;
+}
+.incorrect
+{
+    background-color:#B33A3A;
+    color:white;
+}
