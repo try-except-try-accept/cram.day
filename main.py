@@ -1,4 +1,5 @@
 from flask import Flask, session, url_for, render_template, request, Markup, jsonify
+
 import json
 import gspread
 from random import choice, randrange, shuffle, sample, randint
@@ -21,10 +22,7 @@ def record_answers():
 
     pass
 
-
-
-
-#############################################################################
+    #############################################################################
 
 def get_data(year=None, topics=None):
     '''Get source data from google spreadsheet'''
@@ -50,11 +48,14 @@ def get_data(year=None, topics=None):
             if len(word):
                 misnomers.add(word)
 
-    session['misnomers'] = list(misnomers)
+    with open(f"user_{session['user_id']}_misnomers.json", "w") as f:
+        json.dumps(f, list(misnomers))
 
     print(misnomers)
 
-    session['source_data'] = source_data
+
+    with open(f"user_{session['user_id']}_source_data.json", "w") as f:
+        json.dumps(f, source_data)
 
 
 #############################################################################
@@ -122,8 +123,11 @@ def submit_answer():
 
     session['scores'].append(round(sum(score)/len(score)))
 
+    overall = str(round(sum(session['scores']) / len(session['scores']), 2)) + "%"
+
     response = {'feedback':feedback,
                 'scores':score,
+                'total':overall,
                 'next_question':create_question()}
 
 
@@ -152,6 +156,7 @@ def fill_the_gaps():
     if session.get('scores') is None:
         session['scores'] = []
         session['difficulty'] = 1
+        session['user_id'] = 999
 
 
     return render_template("fill_the_gaps.html")
@@ -162,6 +167,8 @@ def fill_the_gaps():
 def get_hints():
 
     hints = session['correct']
+
+
 
     misnomers = session['misnomers']
 

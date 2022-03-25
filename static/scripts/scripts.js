@@ -114,6 +114,12 @@ function get_stats()
 };
 
 
+function update_score(score)
+{
+    document.getElementById("score_display").innerHTML = score;
+}
+
+
 function process_hints(hints)
 {
     for (let h of hints)
@@ -239,6 +245,9 @@ function submit_answer()
     console.log(fb_anim);
     if (fb_anim != -1) { anim_actions = {"top":fb_anim.toString(), "opacity":0} }
     else { anim_actions = {"left":"1000", "opacity":0} };
+
+
+    update_score(data.total);
 
 
     $("#feedback").css({"opacity":1, "left":"0px", "top":"200px"});
