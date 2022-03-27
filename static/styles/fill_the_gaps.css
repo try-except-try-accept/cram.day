@@ -1,4 +1,9 @@
-
+body
+{
+    text-align:center;
+    margin-left:auto;
+    margin-right:auto;
+}
 
 .hint
 {
@@ -9,9 +14,14 @@
 
 header
 {
-    position:absolute;
     left:0;
-    top:50px;
+
+}
+
+#config
+{
+    left:0;
+
 }
 
 
@@ -22,12 +32,12 @@ header
     top:200px;
 }
 
-#config
+#choose_topics_modal
 {
-    position:absolute;
-    left:0;
-    top:400px;
+    text-align:left;
 }
+
+
 
 
 #question
@@ -51,4 +61,45 @@ header
 {
     background-color:#B33A3A;
     color:white;
+}
+
+#leaderboards
+{
+    position:absolute;
+    top:200px;
+    height:300px;
+}
+
+#overall_leaderboard, #last_hour_leaderboard
+{
+    height:200px;
+    width:200px;
+    position:absolute;
+    top:inherit;
+}
+
+#left_leaderboard
+{
+    left:0px;
+    top:inherit;
+    position:absolute;
+}
+
+#right_leaderboard
+{
+    left:200px;
+    top:inherit;
+    position:absolute;
+}
+
+.leaderboard_slot
+{
+    position:absolute;
+}
+
+h2
+{
+    font-style:italic;
+    font-size:1em;
+    color:#999999;
 }

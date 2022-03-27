@@ -54,6 +54,10 @@ A2_TOPICS = `13.1 User-defined data types
 20.1 Programming Paradigms
 20.2 File Processing and Exception Handling`.split("\n")
 
+const LEADERBOARD_SLOT_SIZE = 20;
+
+const LEADERBOARD_OFFSET = 0;
+
 
 function get_topic_list()
 {
@@ -139,6 +143,97 @@ function get_stats()
 function update_score(score)
 {
     document.getElementById("score_display").innerHTML = score;
+}
+
+
+function init_leaderboards()
+{
+    let leaderboard = document.getElementById("overall_leaderboard")
+    let i = 1;
+    for (let y=0; y+LEADERBOARD_SLOT_SIZE; y<=(LEADERBOARD_SLOT_SIZE*10) )
+    {
+        let leaderboard_slot = document.createElement("div");
+        leaderboard_slot.style.top = y;
+        i++;
+        leaderboard.appendChild(leaderboard_slot);
+    }
+}
+
+function update_slot(name, new_pos, pts, leaderboard)
+{
+
+    leaderboard_slot = $(`div[name="${name}"]`);
+
+    if (leaderboard_slot.length == 0)
+    {
+        let new_slot = document.createElement("div");
+        new_slot.style.top = "inherit";
+        new_slot.style.left = "inherit";
+        new_slot.setAttribute("name", name);
+        new_slot.classList.add("leaderboard_slot");
+        leaderboard.appendChild(new_slot);
+        leaderboard_slot = $(`div[name="${name}"]`);
+    }
+
+
+    leaderboard_slot.html(`${name} : ${pts}`);
+    leaderboard_slot.animate({'top': new_pos.toString()+"px"}, 500);
+}
+
+function update_leaderboards(leaderboards)
+{
+
+    let overall = document.getElementById("overall_leaderboard");
+
+    let update = leaderboards['overall'];
+
+    console.log(update);
+
+    console.log("Does update have keys")
+
+    console.log(Object.keys(update))
+
+    let holders = [];
+
+    // iterate through existing leaderboard slots and animate
+    for (let slot of overall.childNodes)
+    {
+        let current_holder = slot.getAttribute("name")
+        if (Object.keys(update).includes(current_holder))
+        {
+            console.log("new position: " + current_holder)
+
+            new_pos = LEADERBOARD_OFFSET + (update[current_holder][0] * LEADERBOARD_SLOT_SIZE);
+            let pts = update[current_holder][1];
+            update_slot(current_holder, new_pos, pts, overall);
+            holders.push(current_holder);
+        }
+        else
+        {
+            console.log("No longer on the leaderboard: " + current_holder)
+            $(`div[name="${current_holder}"]`).animate({'top': "1000px"}, 500);
+            overall.removeChild(slot);
+        }
+    }
+
+    // iterate through any new leaderboard slots and add in
+    for (let [this_person, row] of Object.entries(update))
+    {
+        if (holders.includes(this_person)) { continue };
+
+        new_pos = LEADERBOARD_OFFSET + (row[0] * LEADERBOARD_SLOT_SIZE);
+        let pts = row[1];
+
+        console.log("Animate to ", new_pos);
+        console.log("Found " + this_person + "who is not in the leaderboard");
+
+        update_slot(this_person, new_pos, pts, overall);
+
+    }
+
+
+
+
 }
 
 
@@ -270,6 +365,8 @@ function submit_answer()
 
 
     update_score(data.total);
+
+    update_leaderboards(data.leaderboards);
 
 
     $("#feedback").css({"opacity":1, "left":"0px", "top":"200px"});

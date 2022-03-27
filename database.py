@@ -2,6 +2,7 @@ import gspread
 from config import DB_MODE
 
 import sqlite3
+from config import *
 from flask import flash
 # db plan
 ###############################
@@ -167,7 +168,46 @@ INSERT INTO answers (answer, correct, user_id, time_stamp) VALUES '''
 def read_leaderboard_from_db():
     """Returns overall leaderboard and last hour leaderboard"""
 
+    q = '''
+    SELECT
+       answers.user_id as user,   
+       users.username,
+       users.nickname,
+       SUM(answers.correct) as overall
+    FROM
+       answers, users
+    WHERE
+        answers.user_id = users.user_id
+    GROUP BY
+        users.user_id
+    HAVING
+        user = answers.user_id
+    ORDER BY overall DESC
+    LIMIT 10'''
 
+    overall_leaderboard = query_db(q)
+
+    q2 = f'''
+SELECT
+   answers.user_id as user,
+   users.username,   
+   users.nickname,
+   SUM(answers.correct) as overall
+FROM
+   answers, users
+WHERE
+	answers.user_id = users.user_id
+	AND answers.time_stamp > {datetime.now().timestamp() - ONE_DAY} 
+GROUP BY
+	users.user_id
+HAVING
+	user = answers.user_id
+ORDER BY overall DESC
+LIMIT 10'''
+
+    last_hour_leaderboard = query_db(q)
+
+    return overall_leaderboard, last_hour_leaderboard
 
 
 if __name__ == "__main__":

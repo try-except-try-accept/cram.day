@@ -5,7 +5,7 @@ import gspread
 from random import choice, randrange, shuffle, sample, randint
 from uuid import uuid4
 
-from database import write_session_to_db, get_question_data,save_answers_to_db
+from database import write_session_to_db, get_question_data,save_answers_to_db, read_leaderboard_from_db
 
 
 
@@ -17,7 +17,21 @@ app.secret_key = uuid4().hex
 def get_stats():
     '''Read database and return leaderboard'''
 
-    return leaderboard
+    overall, last_hour = read_leaderboard_from_db()
+
+    leaderboard_data = {"overall":{}, "last_hour": {}}
+
+    for position, row in enumerate(overall):
+        username = row[1]
+        points = row[3]
+        leaderboard_data['overall'][username] = [position, points]
+
+    for position, row in enumerate(last_hour):
+        username = row[1]
+        points = row[2]
+        leaderboard_data['last_hour'][username] = [position, points]
+
+    return leaderboard_data
 
 #############################################################################
 
@@ -99,13 +113,14 @@ def submit_answer():
 
     overall = str(round(sum(session['scores']) / len(session['scores']), 2)) + "%"
 
+
     response = {'feedback':feedback,
                 'scores':score,
                 'total':overall,
-                'next_question':create_question()}
+                'next_question':create_question(),
+                'leaderboards':get_stats()}
 
 
-    print("returned response")
     return jsonify(response)
 
 #############################################################################
