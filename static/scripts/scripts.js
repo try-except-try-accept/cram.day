@@ -54,7 +54,7 @@ A2_TOPICS = `13.1 User-defined data types
 20.1 Programming Paradigms
 20.2 File Processing and Exception Handling`.split("\n")
 
-const LEADERBOARD_SLOT_SIZE = 20;
+const LEADERBOARD_SLOT_SIZE = 40;
 
 const LEADERBOARD_OFFSET = 0;
 
@@ -160,33 +160,34 @@ function init_leaderboards()
     }
 }
 
-function update_slot(name, new_pos, pts, leaderboard)
+function update_slot(name, new_pos, pts, leaderboard,table_name)
 {
 
-    leaderboard_slot = $(`div[name="${name}"]`);
+    leaderboard_slot = $(`div[name="${table_name+name}"]`);
 
     if (leaderboard_slot.length == 0)
     {
         let new_slot = document.createElement("div");
+        leaderboard.appendChild(new_slot);
         new_slot.style.top = "inherit";
         new_slot.style.left = "inherit";
-        new_slot.setAttribute("name", name);
+        new_slot.setAttribute("name", table_name+name);
         new_slot.classList.add("leaderboard_slot");
-        leaderboard.appendChild(new_slot);
-        leaderboard_slot = $(`div[name="${name}"]`);
+
+        leaderboard_slot = $(`div[name="${table_name+name}"]`);
     }
 
-
-    leaderboard_slot.html(`${name} : ${pts}`);
+    let pos = Math.floor(new_pos / LEADERBOARD_SLOT_SIZE) + 1;
+    leaderboard_slot.html(`#${pos} ${name} (${pts})`);
     leaderboard_slot.animate({'top': new_pos.toString()+"px"}, 500);
 }
 
-function update_leaderboards(leaderboards)
+function update_leaderboard(table_name, leaderboards_update)
 {
 
-    let overall = document.getElementById("overall_leaderboard");
+    let current_leaderboard = document.getElementById(table_name+"_leaderboard");
 
-    let update = leaderboards['overall'];
+    let update = leaderboards_update[table_name];
 
     console.log(update);
 
@@ -197,25 +198,30 @@ function update_leaderboards(leaderboards)
     let holders = [];
 
     // iterate through existing leaderboard slots and animate
-    for (let slot of overall.childNodes)
+    for (let slot of current_leaderboard.childNodes)
     {
         let current_holder = slot.getAttribute("name")
-        if (Object.keys(update).includes(current_holder))
+        let name_only = current_holder.replace(table_name, "")
+        if (Object.keys(update).includes(name_only))
         {
             console.log("new position: " + current_holder)
 
-            new_pos = LEADERBOARD_OFFSET + (update[current_holder][0] * LEADERBOARD_SLOT_SIZE);
-            let pts = update[current_holder][1];
-            update_slot(current_holder, new_pos, pts, overall);
-            holders.push(current_holder);
+            new_pos = LEADERBOARD_OFFSET + (update[name_only][0] * LEADERBOARD_SLOT_SIZE);
+            let pts = update[name_only][1];
+            update_slot(name_only, new_pos, pts, current_leaderboard, table_name);
+            holders.push(name_only);
         }
         else
         {
             console.log("No longer on the leaderboard: " + current_holder)
-            $(`div[name="${current_holder}"]`).animate({'top': BOTTOM_OF_SCREEN.toString()+"px"}, 500);
-            overall.removeChild(slot);
+            $(`div[name="${table_name+current_holder}"]`).animate({'top': BOTTOM_OF_SCREEN.toString()+"px"}, 500);
+            current_leaderboard.removeChild(slot);
         }
     }
+
+    console.log("look at holders")
+
+    console.log(holders)
 
     // iterate through any new leaderboard slots and add in
     for (let [this_person, row] of Object.entries(update))
@@ -228,7 +234,7 @@ function update_leaderboards(leaderboards)
         console.log("Animate to ", new_pos);
         console.log("Found " + this_person + "who is not in the leaderboard");
 
-        update_slot(this_person, new_pos, pts, overall);
+        update_slot(this_person, new_pos, pts, current_leaderboard, table_name);
 
     }
 
@@ -269,10 +275,15 @@ function process_hints(hints)
          new_hint.innerHTML = h.text;
          new_hint.classList.add("hint")
          new_hint.style.top = h.y.toString() + "px";
-         new_hint.style.left = h.x.toString() + "px";
+         new_hint.style.left = ((window.screen.width * (1/6)) + h.x).toString() + "px";
          new_hint.style.color = h.colour;
-
          document.getElementsByTagName("body")[0].appendChild(new_hint);
+
+         new_hint.opacity = 1;
+
+        $(new_hint).fadeOut(5000, function() {
+            $(this).remove();
+        });
     }
 }
 
@@ -280,15 +291,10 @@ function remove_hints()
 {
     let body = document.getElementsByTagName("body")[0];
 
-    $('.hint').each(function(i, obj)
+    for (let hint of document.getElementsByClassName("hint"))
     {
-        let option = Math.floor(Math.random() * 10);
-
-        if (option > 7) { this.animate({"top":"0"}, 1000, () => this.fadeOut(100)) }
-        else if (option > 5) { this.animate({"top":BOTTOM_OF_SCREEN.toString()+"px"}, () => this.fadeOut(100) )}
-        else if (option > 2) { this.animate({"left":BOTTOM_OF_SCREEN.toString()+"px"}, () => this.fadeOut(100) )}
-        else  { this.animate({"top":BOTTOM_OF_SCREEN.toString()+"px", "left":BOTTOM_OF_SCREEN.toString()+"px"}, () => this.fadeOut(100)) } ;
-    });
+        body.removeChild(hint);
+    }
 }
 
 function process_feedback(feedback, scores)
@@ -385,7 +391,8 @@ function submit_answer()
 
     update_score(data.total);
 
-    update_leaderboards(data.leaderboards);
+    update_leaderboard("overall", data.leaderboards);
+    update_leaderboard("last_hour", data.leaderboards);
 
 
     animate_feedback(fb_anim, data);

@@ -5,7 +5,7 @@ import gspread
 from random import choice, randrange, shuffle, sample, randint
 from uuid import uuid4
 
-from database import write_session_to_db, get_question_data,save_answers_to_db, read_leaderboard_from_db
+from database import write_session_to_db, get_question_data,save_answers_to_db, read_leaderboard_from_db, get_misnomers
 
 
 
@@ -28,7 +28,7 @@ def get_stats():
 
     for position, row in enumerate(last_hour):
         username = row[1]
-        points = row[2]
+        points = row[3]
         leaderboard_data['last_hour'][username] = [position, points]
 
     return leaderboard_data
@@ -92,6 +92,8 @@ def submit_answer():
 
     answers = request.form.get("answers").split(",")
 
+    answers_copy = list(answers)
+
     question = session['question']
     replacements = session['correct']
 
@@ -108,7 +110,7 @@ def submit_answer():
             score.append(0)
 
 
-    save_answers_to_db(session['user_id'], replacements, score)
+    save_answers_to_db(session['user_id'], answers_copy, score)
 
     session['scores'].append(round(sum(score)/len(score)))
 
@@ -153,7 +155,7 @@ def fill_the_gaps():
     if session.get('scores') is None:
         session['scores'] = []
         session['difficulty'] = 1
-        session['user_id'] = 0
+        session['user_id'] = 999
 
 
     return render_template("fill_the_gaps.html")
@@ -165,17 +167,9 @@ def get_hints():
 
     hints = session['correct']
 
-
-
-    misnomers = session['misnomers']
-
-    for i in range(6, 10):
-
-        misnomer = choice(misnomers)
-        hints.append(misnomer)
+    hints = get_misnomers(hints)
 
     shuffle(hints)
-
 
     final_hints = []
 

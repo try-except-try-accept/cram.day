@@ -11,6 +11,7 @@ from flask import flash
 # user answers question -> db updates answers table, db returns leaderboard data
 # daemon/periodic update -> server updates questions table based on gspread
 from datetime import datetime
+from random import sample, shuffle
 
 def query_db(query):
 
@@ -128,6 +129,36 @@ WHERE questions.topic_index IN ({topics})
     print(q2)
     query_db(q2)
 
+def get_misnomers(correct):
+    q = '''SELECT gaps FROM questions'''
+
+    results = query_db(q)
+
+    keywords = []
+
+
+
+    for row in results:
+        keywords += [word for word in row[0].split(", ")]
+
+
+    print(keywords)
+
+    misnomers = sample(keywords, 10)
+    for c in correct:
+        while c in results:
+            misnomers = sample(keywords, 10)
+
+
+    misnomers += correct
+
+    shuffle(misnomers)
+
+    return misnomers
+
+
+
+
 def get_question_data(user_id):
     """Generates a question and updates session table"""
     q = '''SELECT questions.question_id, questions.question, questions.gaps, sessions.gen_count
@@ -142,7 +173,7 @@ def get_question_data(user_id):
 
     if count is not None:
         count -= 1
-        q = '''
+        q = f'''
 UPDATE sessions
 SET gen_count = {count}
 WHERE question_id = {question_id} AND user_id = {user_id}
@@ -205,7 +236,7 @@ HAVING
 ORDER BY overall DESC
 LIMIT 10'''
 
-    last_hour_leaderboard = query_db(q)
+    last_hour_leaderboard = query_db(q2)
 
     return overall_leaderboard, last_hour_leaderboard
 

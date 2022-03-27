@@ -42,8 +42,6 @@
 
 
                 <div id="config">
-                    <button id="hint_button" onclick="get_hints();">Show hints</button>
-                    <button id="check_button" onclick="submit_answer();">Check</button>
 
                     <label for="course">Select course:</label>
                     <select name="course" id="course">
@@ -52,10 +50,14 @@
                       <option value="as">CIE AS Level</option>
                     </select>
 
-                    <button id="choose_button" onclick="get_topic_list();"  class="btn btn-warning" class="buttonStyle"
+
+                    <button id="choose_button" onclick="get_topic_list();"  class="btn btn-dark" type="button"
                                         data-toggle="modal" data-target="#choose_topics_modal">
                         Choose topics
                     </button>
+
+                    <button id="hint_button" onclick="get_hints();" class="btn btn-dark" type="button">Show hints</button>
+                    <button id="check_button" onclick="submit_answer();" class="btn btn-dark" type="button">Check</button>
 
                 </div>
 
