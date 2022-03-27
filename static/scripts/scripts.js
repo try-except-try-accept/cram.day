@@ -59,14 +59,15 @@ function get_topic_list()
 {
 
     let course = document.getElementById("course").value;
-
+    let offset = 1;
     if (course == "igcse") { source = IGCSE_TOPICS; }
-    else if (course == "a2") { source = A2_TOPICS; }
+    else if (course == "a2") { source = A2_TOPICS; offset = 40;}
 
     let topic_checkbox_display = document.getElementById("topic_checkbox_display");
 
     topic_checkbox_display.innerHTML = '';
 
+    let count = offset
     for (let topic of source)
     {
         topic_id = topic.split(" ");
@@ -89,13 +90,34 @@ function get_topic_list()
         checkbox.setAttribute("checked", true);
         checkbox.setAttribute("name", topic_index);
         checkbox.setAttribute("id", "topic_"+topic_id);
+        checkbox.setAttribute("index", count)
+
         label.setAttribute("for", "topic_"+topic_id);
         label.innerHTML = topic;
 
         topic_checkbox_display.appendChild(checkbox_div);
 
+        count++;
+
     }
 
+
+    topic_checkbox_display.innerHTML = topic_checkbox_display.innerHTML + `
+                            <label for="q_repeat">Repeat each question </label>
+
+                            <select name="q_repeat" id="q_repeat">
+                                <option value="infinity" selected>∞</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                            </select> times.`;
 
 }
 
@@ -270,9 +292,10 @@ function get_question()
     selected_topics = [];
     for (let t of topics)
     {
-        if (t.checked) { selected_topics.push(t.name)}
+        if (t.checked) { selected_topics.push(t.getAttribute("name"))}
     }
     form_data.append("selected_topics", selected_topics);
+    form_data.append("q_repeat", document.getElementById("q_repeat").value);
     console.log(form_data);
 
     fetch('/get_question',

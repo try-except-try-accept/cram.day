@@ -5,6 +5,9 @@ import gspread
 from random import choice, randrange, shuffle, sample, randint
 from uuid import uuid4
 
+from database import write_session_to_db, generate_question
+
+
 app = Flask(__name__)
 app.secret_key = uuid4().hex
 
@@ -24,47 +27,12 @@ def record_answers():
 
     #############################################################################
 
-def get_data(year=None, topics=None):
-    '''Get source data from google spreadsheet'''
-    gc = gspread.service_account(filename="secret/cram-revision-app-7385639ec69b.json")
-    sh = gc.open('CRAM Data Source')
-
-    fill_gaps = sh.worksheet('fill_gaps')
-    data = fill_gaps.get('A2:1000')
-
-    source_data = []
-
-    misnomers = set()
-
-    for row in data:
-        if topics is None or row[2] in topics:
-            this_question = {}
-            this_question['question'] = row[0]
-            this_question['keywords'] = row[1].split(", ")
-            this_question['topic'] = row[2]
-            source_data.append(this_question)
-
-        for word in row[1].split(", "):
-            if len(word):
-                misnomers.add(word)
-
-    with open(f"user_{session['user_id']}_misnomers.json", "w") as f:
-        json.dumps(f, list(misnomers))
-
-    print(misnomers)
-
-
-    with open(f"user_{session['user_id']}_source_data.json", "w") as f:
-        json.dumps(f, source_data)
-
-
-#############################################################################
 
 def create_question():
     '''Choose random question based on session params'''
 
 
-    source_data = session['source_data']
+    question = generate_question('user_id')
 
     if len(source_data) == 0:
         return "<p>You've answered all questions on your chosen topic.</p>"
@@ -143,8 +111,15 @@ def get_question():
 
     if request.method == "POST":
         topics = request.form.get("selected_topics").split(",")
+        q_repeat = request.form.get("q_repeat")
+        if q_repeat == "infinity":
+            q_repeat = None
+
+
         print("topics is", topics)
-        get_data(topics)
+        print("q rpeat is", q_repeat)
+
+        write_session_to_db(topics, q_repeat, session['user_id'])
 
     return create_question()
 
@@ -156,7 +131,7 @@ def fill_the_gaps():
     if session.get('scores') is None:
         session['scores'] = []
         session['difficulty'] = 1
-        session['user_id'] = 999
+        session['user_id'] = 0
 
 
     return render_template("fill_the_gaps.html")
