@@ -72,7 +72,8 @@ def create_question():
 
             if rep_word in word:
                 session['correct'].append(rep_word)
-                add_field = " " + word.replace(rep_word, f'<input class="gap_textfield" type="text" name="answer{i}">') + " "
+                add_field = " " + word.replace(rep_word, f'<input class="gap_textfield" type="text" name="answer{i}" required'
+                                                         f'>') + " "
                 html_out += add_field
                 i += 1
             else:

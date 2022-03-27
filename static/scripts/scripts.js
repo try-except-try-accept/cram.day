@@ -58,6 +58,7 @@ const LEADERBOARD_SLOT_SIZE = 20;
 
 const LEADERBOARD_OFFSET = 0;
 
+BOTTOM_OF_SCREEN = window.screen.height - 300;
 
 function get_topic_list()
 {
@@ -211,7 +212,7 @@ function update_leaderboards(leaderboards)
         else
         {
             console.log("No longer on the leaderboard: " + current_holder)
-            $(`div[name="${current_holder}"]`).animate({'top': "1000px"}, 500);
+            $(`div[name="${current_holder}"]`).animate({'top': BOTTOM_OF_SCREEN.toString()+"px"}, 500);
             overall.removeChild(slot);
         }
     }
@@ -231,6 +232,29 @@ function update_leaderboards(leaderboards)
 
     }
 
+
+
+
+}
+
+function animate_feedback(fb_anim, data)
+{
+    console.log("feedback anim");
+    console.log(fb_anim);
+    if (fb_anim != -1) { anim_actions = {"top":fb_anim.toString(), "opacity":0} }
+    else { anim_actions = {"left":"1000", "opacity":0} };
+
+    let fb =$("#feedback")
+
+    fb.css({"opacity":1, "top":"200px"});
+    fb.show();
+    fb.fadeOut(0);
+    fb.fadeIn(1000,
+        () => $("#question").html(data.next_question).fadeIn(100,
+            () => fb.animate(anim_actions, 1000,  () => fb.hide()
+            )
+        )
+    );
 
 
 
@@ -261,9 +285,9 @@ function remove_hints()
         let option = Math.floor(Math.random() * 10);
 
         if (option > 7) { this.animate({"top":"0"}, 1000, () => this.fadeOut(100)) }
-        else if (option > 5) { this.animate({"top":"1000px"}, () => this.fadeOut(100) )}
-        else if (option > 2) { this.animate({"left":"1000px"}, () => this.fadeOut(100) )}
-        else  { this.animate({"top":"1000px", "left":"1000px"}, () => this.fadeOut(100)) } ;
+        else if (option > 5) { this.animate({"top":BOTTOM_OF_SCREEN.toString()+"px"}, () => this.fadeOut(100) )}
+        else if (option > 2) { this.animate({"left":BOTTOM_OF_SCREEN.toString()+"px"}, () => this.fadeOut(100) )}
+        else  { this.animate({"top":BOTTOM_OF_SCREEN.toString()+"px", "left":BOTTOM_OF_SCREEN.toString()+"px"}, () => this.fadeOut(100)) } ;
     });
 }
 
@@ -277,8 +301,7 @@ function process_feedback(feedback, scores)
 
     feedback_div.innerHTML = "";
 
-    for (let child of question_div.childNodes
-    )
+    for (let child of question_div.childNodes)
     {
         let new_node = child.cloneNode()
         try
@@ -324,7 +347,7 @@ function process_feedback(feedback, scores)
 
 
     if (average(scores) == 1) { return 0 }
-    else if (average(scores) == 0) { return 1000 }
+    else if (average(scores) == 0) { return BOTTOM_OF_SCREEN }
     else { return -1}
 
 
@@ -358,10 +381,6 @@ function submit_answer()
     console.log(data);
     remove_hints();
     let fb_anim = process_feedback(data.feedback, data.scores);
-    console.log("feedback anim");
-    console.log(fb_anim);
-    if (fb_anim != -1) { anim_actions = {"top":fb_anim.toString(), "opacity":0} }
-    else { anim_actions = {"left":"1000", "opacity":0} };
 
 
     update_score(data.total);
@@ -369,13 +388,8 @@ function submit_answer()
     update_leaderboards(data.leaderboards);
 
 
-    $("#feedback").css({"opacity":1, "left":"0px", "top":"200px"});
-    $("#feedback").fadeOut(0);
-    $("#feedback").fadeIn(1000,
-        () => $("#question").html(data.next_question).fadeIn(100,
-            () => $("#feedback").animate(anim_actions, 1000, () => null)
-        )
-    );
+    animate_feedback(fb_anim, data);
+
 
     }
     );

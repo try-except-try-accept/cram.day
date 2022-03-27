@@ -29,20 +29,21 @@
         <h2>completely remember all mark schemes!</h2>
     </header>
 
-
     <div class="container-fluid">
+
+        <div id="left_leaderboard">
+            <h3>Overall:</h3>
+            <div id="overall_leaderboard"></div>
+        </div>
 
         <div id="quiz">
 
                 <div id="score_display"></div>
-                <div id="question"></div>
-                <div id="feedback"></div>
+
 
                 <div id="config">
                     <button id="hint_button" onclick="get_hints();">Show hints</button>
                     <button id="check_button" onclick="submit_answer();">Check</button>
-
-
 
                     <label for="course">Select course:</label>
                     <select name="course" id="course">
@@ -58,20 +59,19 @@
 
                 </div>
 
-                <div id="leaderboards">
-                    <div id="left_leaderboard">
-                        <h3>Overall:</h3>
-                        <div id="overall_leaderboard"></div>
-                    </div>
-                    <div id="right_leaderboard">
-                        <h3>Last hour:</h3>
-                        <div id="last_hour_leaderboard"></div>
-                    </div>
-                </div>
-
-
+                <div id="question"></div>
+                <div id="feedback"></div>
 
         </div>
+
+
+        <div id="right_leaderboard">
+            <h3>Last hour:</h3>
+            <div id="last_hour_leaderboard"></div>
+        </div>
+
+
+
 
     </div>
     <div id="choose_topics_modal" class="modal fade" role="dialog">
