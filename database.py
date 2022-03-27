@@ -9,6 +9,7 @@ from flask import flash
 # server generates question -> db selects from question table and updates session table counts
 # user answers question -> db updates answers table, db returns leaderboard data
 # daemon/periodic update -> server updates questions table based on gspread
+from datetime import datetime
 
 def query_db(query):
 
@@ -22,12 +23,13 @@ def query_db(query):
     res = None
 
     print("Executing")
-    view_query = query
+    print(query)
 
     try:
 
         res = cursor.execute(query)
-
+        if res is not None:
+            res = res.fetchall()
 
         conn.commit()
         conn.close()
@@ -109,28 +111,57 @@ def write_session_to_db(topics, q_repeat, user_id):
 
     topics = ",".join([f'"{t}"' for t in topics])
     q = f'''UPDATE sessions
-SET in_use_flag = CASE WHEN questions.topic_index IN ({topics}) THEN 1 ELSE 0 END, count = {q_repeat}
+SET in_use_flag = CASE WHEN questions.topic_index IN ({topics}) THEN 1 ELSE 0 END, gen_count = {q_repeat}
 FROM questions
 WHERE sessions.user_id = {user_id} AND questions.question_id = sessions.question_id;'''
+
+    q2 = f'''
+INSERT OR IGNORE INTO sessions (user_id, question_id, in_use_flag, gen_count)
+SELECT {user_id}, questions.question_id, 1, {q_repeat}
+FROM questions, sessions
+WHERE questions.topic_index IN ({topics})
+'''
+
     print(q)
     query_db(q)
+    print(q2)
+    query_db(q2)
 
-
-def generate_question(user_id):
+def get_question_data(user_id):
     """Generates a question and updates session table"""
+    q = '''SELECT questions.question_id, questions.question, questions.gaps, sessions.gen_count
+    FROM questions, sessions
+    WHERE questions.question_id = sessions.question_id
+    AND sessions.user_id = 0
+    AND sessions.in_use_flag = 1
+    ORDER BY Random()
+    LIMIT 1;'''
+
+    question_id, question_text, gaps, count = query_db(q)[0]
+
+    if count is not None:
+        count -= 1
+        q = '''
+UPDATE sessions
+SET gen_count = {count}
+WHERE question_id = {question_id} AND user_id = {user_id}
+'''
+        query_db(q)
+
+    return question_text, gaps
 
 
 
-
-def write_answer_to_db(q_id, answer, user_id):
+def save_answers_to_db(user_id, answers, scores):
     """Writes the most recent answer to the database"""
 
+    q = '''
+INSERT INTO answers (answer, correct, user_id, time_stamp) VALUES '''
 
 
+    q += ",".join(f'("{answer}", {score}, "{user_id}", {int(datetime.now().timestamp())})' for answer, score in zip(answers, scores))
 
-def read_session_from_db():
-    """Returns a question set based on user's topic settings"""
-
+    query_db(q)
 
 
 def read_leaderboard_from_db():
@@ -138,6 +169,7 @@ def read_leaderboard_from_db():
 
 
 
+
 if __name__ == "__main__":
 
-    test()
+    generate_question(0)

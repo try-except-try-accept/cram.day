@@ -1,11 +1,12 @@
-from flask import Flask, session, url_for, render_template, request, Markup, jsonify
+from flask import Flask, session, url_for, render_template, request, Markup, jsonify, redirect, flash
 
 import json
 import gspread
 from random import choice, randrange, shuffle, sample, randint
 from uuid import uuid4
 
-from database import write_session_to_db, generate_question
+from database import write_session_to_db, get_question_data,save_answers_to_db
+
 
 
 app = Flask(__name__)
@@ -32,31 +33,34 @@ def create_question():
     '''Choose random question based on session params'''
 
 
-    question = generate_question('user_id')
+    question_data = get_question_data(session['user_id'])
 
-    if len(source_data) == 0:
-        return "<p>You've answered all questions on your chosen topic.</p>"
-
-    i = randrange(0, len(source_data))
-    question = session['source_data'].pop(i)
-
+    if question_data is None:
+        flash("You've answered all questions according to your current settings.", "error")
+        return redirect(url_for("fill_the_gaps"))
+    question, gaps = question_data
 
     replacements = []
-    kw = question['keywords']
+    kw = gaps.replace(" ", ",").replace(",,", ",").split(",")
+
     for i in range(session['difficulty']):
         replacements.append(kw.pop(randrange(0, len(kw))))
 
     session['correct'] = []
-
-    question = question['question']
-
     html_out = ""
+    print("replacements is", replacements)
 
-    for word in question.split(" "):
-        for rep in replacements:
-            if rep in word:
-                session['correct'].append(rep)
-                html_out += f' <input class="gap_textfield" type="text" name="answer{i}">'
+    i = 0
+    question_tokens = question.split(" ")
+
+    for y, word in enumerate(question_tokens):
+        for rep_word in replacements:
+
+            if rep_word in word:
+                session['correct'].append(rep_word)
+                add_field = " " + word.replace(rep_word, f'<input class="gap_textfield" type="text" name="answer{i}">') + " "
+                html_out += add_field
+                i += 1
             else:
                 html_out += " " + word
 
@@ -88,6 +92,8 @@ def submit_answer():
             feedback.append(correct_answer)
             score.append(0)
 
+
+    save_answers_to_db(session['user_id'], replacements, score)
 
     session['scores'].append(round(sum(score)/len(score)))
 
