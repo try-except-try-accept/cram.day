@@ -13,12 +13,34 @@ from flask import flash
 from datetime import datetime
 from random import sample, shuffle
 
+
+def authenticate_user(username, password):
+
+    if not (username+password).isalnum():
+        flash("Illegal chars in username / password.")
+        return False
+
+
+    q = f'SELECT user_id, nickname FROM users WHERE username="{username}" AND code="{password}" LIMIT 1'
+
+    result = query_db(q)
+
+    print(result)
+
+    if result is None or len(result) == 0:
+        return None
+
+    else:
+        return {'user_id':str(result[0][0]).strip(), 'display_name':result[0][1].strip(), 'username':username}
+
+
+
 def query_db(query):
 
     """Connect to and execute db query"""
 
     if DB_MODE == "lite":
-        conn = sqlite3.connect("db/test_database.db")
+        conn = sqlite3.connect("db/fill_the_gaps.db")
         cursor = conn.cursor()
 
 
