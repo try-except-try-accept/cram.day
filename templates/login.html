@@ -1,43 +1,40 @@
 <!DOCTYPE html>
-<html>
-<title>Examinator</title>
-
-<!-- VO to DO
-
-1. Skip question button
-2. Add 2012/2011 papers
-3. Add 2015 mock paper + create mark scheme -- done 19/05
-4. Automatically markup code questions in Python IDE style formatting
-5. GCSE mode
-6. COMP2 mode
-7. A Level IT mode
-
--->
-
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fill The Gaps</title>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
         integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
         crossorigin="anonymous"></script>
 
-<link href='https://fonts.googleapis.com/css?family=Nunito|Codystar|Open+Sans' rel='stylesheet' type='text/css'>
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    <script src="static/scripts/fill_the_gaps.js"></script>
+
+    <link href='https://fonts.googleapis.com/css?family=Nunito|Codystar|Open+Sans' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
       integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
-<link href="static/bootstrap-tagsinput.css" rel="stylesheet" type="text/css">
-<script src="static/bootstrap-tagsinput.js"></script>
-<link href="static/examinatorstyles.css" rel="stylesheet" type="text/css">
+
+    <link href="static/styles/fill_the_gaps.css" rel="stylesheet" type="text/css">
 
 
 </head>
+<body>
 
-<body style="background-color:#{% if mode=='question' %}F3FFF3{% elif mode == 'assess' %}F3FFF3{% else %}DDFFFF{% endif %}">
 
 
 
 
 <div class="container-fluid">
+
+
+    <header>
+        <h1>C.R.A.M</h1>
+        <h2>completely remember all mark schemes!</h2>
+    </header>
 
 	<!-- formContainer - holds answer input, answer display, check Answer/next question buttons and award marks dropdown -->
 	<form method="POST" action="/login">
@@ -79,16 +76,7 @@
 
 </div>
 
+
 </body>
-
 </html>
-<script>
-	let messages = [];
-	{% for msg in get_flashed_messages()|reverse %}
-	messages.push(unescape("{{ msg }}"));
-	{% endfor %}
-	flash_message(messages)
-
-</script>
-
 
