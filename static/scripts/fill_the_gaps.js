@@ -131,6 +131,7 @@ function get_stats()
 {
     fetch('/get_stats')
     .then(res => {
+    if (res==404) { window.location.href = "/login";}
     return res.text()})
     .then(data => {
     $('#stats_modal_header').html('<h4 class="modal-title">' + JSON.parse(data).display_name + "'s Stats</h4>");
@@ -143,7 +144,7 @@ function get_stats()
 
 function update_score(score)
 {
-    document.getElementById("score_display").innerHTML = score;
+    //document.getElementById("score_display").innerHTML = score;
 }
 
 
@@ -382,6 +383,10 @@ function submit_answer()
         method:"post"
     })
     .then(res => {
+
+    if (res==404) { window.location.href = "/login";}
+
+
     return res.json()})
     .then(data => {
 
@@ -426,6 +431,7 @@ function get_question()
         method:"post"
     })
     .then(res => {
+    if (res==404) { window.location.href = "/login";}
     return res.text()})
     .then(data => {
      $('#choose_topics_modal').modal('toggle');
@@ -440,6 +446,7 @@ function get_hints()
 {
     fetch('/get_hints')
     .then(res => {
+    if (res==404) { window.location.href = "/login";}
     return res.json()})
     .then( data => process_hints(data));
 };

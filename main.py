@@ -8,7 +8,7 @@ from random import choice, randrange, shuffle, sample, randint
 from uuid import uuid4
 
 from database import write_session_to_db, get_question_data,save_answers_to_db, read_leaderboard_from_db, \
-                     get_misnomers, authenticate_user, load_user_creds
+                     get_misnomers, authenticate_user, load_user_creds, load_question_data_to_db
 
 from waitress import serve
 from user import User
@@ -48,7 +48,7 @@ def get_stats():
         return leaderboard_data
 
     else:
-        return "You must login to view the leaderboard."
+        return 404
 
 #############################################################################
 
@@ -103,7 +103,7 @@ def create_question():
 
     else:
 
-        return "You must login to create a question"
+        return 404
 
 #############################################################################
 
@@ -141,7 +141,7 @@ def submit_answer():
         return jsonify(response)
     else:
 
-        return "You must login to submit an answer"
+        return 404
 
 #############################################################################
 
@@ -207,7 +207,7 @@ def get_hints():
         return jsonify(final_hints)
 
     else:
-        return "Only a logged in user can get hints"
+        return 404
 
 #############################################################################
 
@@ -234,6 +234,15 @@ def logout():
 
     return redirect(url_for("login"))
 
+@app.route("/", methods=["GET", "POST"])
+def home():
+    return redirect(url_for(("login")))
+
+
+@app.route("/gspread_load")
+def gspread_load():
+    if current_user.is_admin:
+        return load_question_data_to_db()
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -261,7 +270,7 @@ def login():
         if username == this_user.username and password == this_user.password:
             login_user(this_user)
             flash('Logged in successfully ' + username)
-            redirect(url_for('fill_the_gaps'))
+            return redirect(url_for('fill_the_gaps'))
         else:
             flash('Login Unsuccessful.')
 

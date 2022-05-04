@@ -32,6 +32,19 @@ header
 
 }
 
+#login
+{
+
+    left:-webkit-calc(100vw * 0.43);
+    left:-moz-calc(100vw * 0.43);
+    left:calc(100vw * 0.43);
+    width:-webkit-calc(100vw * 0.43);
+    width:-moz-calc(100vw * 0.43);
+    width:calc(100vw * 0.43);
+    position:absolute;
+}
+
+
 #quiz
 {
 

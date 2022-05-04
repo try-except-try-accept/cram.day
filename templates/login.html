@@ -37,40 +37,49 @@
     </header>
 
 	<!-- formContainer - holds answer input, answer display, check Answer/next question buttons and award marks dropdown -->
+
+    <div class="container-fluid">
+
+        <div id="left_leaderboard">
+        </div>
 	<form method="POST" action="/login">
-		<div id="error"></div>
 
-		<!-- start of top bar -->
-        <div class="row">
-			<!-- banner  -->
 
-            <div class="col-lg-6 col-sm-9">
-                <div id="bannerContainer">
-                   {% with messages = get_flashed_messages() %}
-                      {% if messages %}
-                        <ul class=flashes>
-                        {% for message in messages %}
-                          <li>{{ message }}</li>
-                        {% endfor %}
-                        </ul>
-                      {% endif %}
-                    {% endwith %}
+
+
+        <div id="login">
+
+            <!-- start of top bar -->
+            <div class="row">
+                <!-- banner  -->
+
+                <div class="col-lg-6 col-sm-9">
+                    <div id="bannerContainer">
+                       {% with messages = get_flashed_messages() %}
+                          {% if messages %}
+
+                            {% for message in messages %}
+                              <p>{{ message }}</p>
+                            {% endfor %}
+
+                          {% endif %}
+                        {% endwith %}
+                    </div>
                 </div>
+
             </div>
 
+            <div class="row">
 
 
-            <div class="col-lg-6 col-sm-3" id="login_container">
+                <table>
+                   <tr><td> <label class="login_element" for="uname"><b>Username:</b></label><br></td>
+                    <td><input class="login_element" type="text" placeholder="Enter Username" name="uname" required></td></tr>
 
 
-                <div class="row">
-                    <label class="login_element" for="uname"><b>Username:</b></label>
-                    <input class="login_element" type="text" placeholder="Enter Username" name="uname" required>
-                </div>
-                <div class="row">
-                    <label class="login_element" for="psw"><b>Password:</b></label>
-                    <input class="login_element" type="password" placeholder="Enter Password" name="psw" required>
-                </div>
+                    <tr><td><label class="login_element" for="psw"><b>Password:</b></label><br></td>
+                    <td><input class="login_element" type="password" placeholder="Enter Password" name="psw" required></td></tr>
+                </table>
                 <div class="row">
                     <label class="login_element"></label>
                     <button  class="login_element" type="submit">Login</button>

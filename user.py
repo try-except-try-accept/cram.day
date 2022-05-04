@@ -7,6 +7,8 @@ class User(UserMixin):
          self.password = password
          self.authenticated = False
          self.nick = nick
+         self.is_admin = username == "mrhallbkk"
+
     def is_active(self):
          return self.is_active()
     def is_anonymous(self):

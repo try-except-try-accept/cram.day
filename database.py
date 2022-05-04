@@ -3,7 +3,7 @@ from config import DB_MODE
 
 import sqlite3
 from config import *
-from flask import flash
+from flask import flash, Markup
 # db plan
 ###############################
 # user chooses topics -> db updates session table flags
@@ -79,7 +79,7 @@ def query_db(query):
     except Exception as e:
         conn.close()
         print(e)
-        input()
+
 
         return None
 
@@ -94,6 +94,8 @@ def test():
 def load_question_data_to_db():
     """Connects to google sheet and updates question data
     run periodically according to quota"""
+
+    query_db("DELETE FROM questions")
 
     gc = gspread.service_account(filename="secret/cram-revision-app-5da8bea462ae.json")
     sh = gc.open('CRAM Data Source')
@@ -111,6 +113,11 @@ def load_question_data_to_db():
     q = q[:-2] + ";"
     print(q)
     query_db(q)
+
+    question_data = query_db("SELECT * FROM questions")
+    return Markup("<p>Data added:</p><table>" + "".join(["<tr>" + "".join([f"<td>{col}</td>" for col in row])+"</tr>" for row in question_data]) + "</table>")
+
+
 
 
 def check_sanitised(topics=None, not_null_ids=None, null_ints=None):
