@@ -269,6 +269,7 @@ function animate_feedback(fb_anim, data)
 
 function process_hints(hints)
 {
+    document.getElementById("hint_button").disabled = true;
     for (let h of hints)
     {
          let new_hint = document.createElement("div")
@@ -285,6 +286,8 @@ function process_hints(hints)
             $(this).remove();
         });
     }
+
+
 }
 
 function remove_hints()
@@ -302,6 +305,7 @@ function process_feedback(feedback, scores)
 
     console.log("Feedback is");
     console.log(feedback);
+    document.getElementById("hint_button").disabled = false;
     feedback_div = document.getElementById("feedback");
     question_div = document.getElementById("question");
 

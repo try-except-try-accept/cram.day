@@ -268,4 +268,7 @@ def login():
     return render_template("login.html")
 
 
+app.run(debug=True)
+
+#
 serve(app, host='0.0.0.0', port=8080)

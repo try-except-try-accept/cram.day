@@ -46,9 +46,15 @@
 
             <div class="col-lg-6 col-sm-9">
                 <div id="bannerContainer">
-                    <header><h1>Examinator V3</h1>
-                        <h3 class="tagline">A revision tool for the reflective Computer Science student</h3>
-                    </header>
+                   {% with messages = get_flashed_messages() %}
+                      {% if messages %}
+                        <ul class=flashes>
+                        {% for message in messages %}
+                          <li>{{ message }}</li>
+                        {% endfor %}
+                        </ul>
+                      {% endif %}
+                    {% endwith %}
                 </div>
             </div>
 
