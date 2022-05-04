@@ -14,6 +14,21 @@ from datetime import datetime
 from random import sample, shuffle
 
 
+def load_user_creds(user_id=None, username=None):
+    if username:
+        result = query_db(f'SELECT user_id, username, nickname, code from users where username = "{username}"')
+    else:
+        result = query_db(f'SELECT user_id, username, nickname, code from users where user_id = "{user_id}"')
+
+    print(result)
+
+    if result is None or len(result) == 0:
+        return None
+
+    else:
+        return result[0]
+
+
 def authenticate_user(username, password):
 
     if not (username+password).isalnum():

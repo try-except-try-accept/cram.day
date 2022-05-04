@@ -2,28 +2,27 @@ from flask import Flask, session, url_for, render_template, request, Markup, jso
 
 import json
 import gspread
+
+
 from random import choice, randrange, shuffle, sample, randint
 from uuid import uuid4
 
 from database import write_session_to_db, get_question_data,save_answers_to_db, read_leaderboard_from_db, \
-                     get_misnomers, authenticate_user
+                     get_misnomers, authenticate_user, load_user_creds
 
 from waitress import serve
 from user import User
-from flask_login import (
-    LoginManager,
-    UserMixin,
-    current_user,
-    login_required,
-    login_user,
-    logout_user,
-)
+
+from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
+
+
 
 app = Flask(__name__)
 app.secret_key = uuid4().hex
 
 
-current_user = User()
+login_manager = LoginManager(app)
+login_manager.login_view = "login"
 
 #############################################################################
 
@@ -65,7 +64,7 @@ def create_question():
     '''Choose random question based on session params'''
 
     if current_user.is_authenticated:
-        question_data = get_question_data(session['user_id'])
+        question_data = get_question_data(current_user.user_id)
 
         if question_data is None:
             flash("You've answered all questions according to your current settings.", "error")
@@ -129,9 +128,9 @@ def submit_answer():
                 feedback.append(correct_answer)
                 score.append(0)
 
-        save_answers_to_db(session['user_id'], answers_copy, score)
+        save_answers_to_db(current_user.user_id, answers_copy, score)
         session['scores'].append(round(sum(score)/len(score)))
-        overall = str(round(sum(session['scores']) / len(session['scores']), 2)) + "%"
+        overall = str(round(sum(session['scores']) / len(session['scores']), 2) * 100) + "%"
         response = {'feedback':feedback,
                     'scores':score,
                     'total':overall,
@@ -159,7 +158,7 @@ def get_question():
             print("topics is", topics)
             print("q rpeat is", q_repeat)
 
-            write_session_to_db(topics, q_repeat, session['user_id'])
+            write_session_to_db(topics, q_repeat, current_user.user_id)
 
     return create_question()
 
@@ -173,7 +172,7 @@ def fill_the_gaps():
         if session.get('scores') is None:
             session['scores'] = []
             session['difficulty'] = 1
-            session['user_id'] = 999
+
 
         return render_template("fill_the_gaps.html")
 
@@ -212,13 +211,24 @@ def get_hints():
 
 #############################################################################
 
+@login_manager.user_loader
+def load_user(user_id):
+
+    creds = load_user_creds(user_id=user_id)
+
+    if creds is None:
+        return None
+    else:
+        user_id, username, nick, password = creds
+        return User(user_id, username, nick, password)
+
 @app.route("/logout")
 def logout():
 
-    try:
-        logout_user()
+    if current_user.is_authenticated:
+        current_user = User()
         flash("You have logged out.")
-    except Exception as e:
+    else:
         print(e)
         flash("No user to log out.", "error")
 
@@ -231,22 +241,29 @@ def login():
 
     if current_user.is_authenticated:
         flash("You are already logged in.", "error")
-        return redirect(url_for("question"))
+        return redirect(url_for("fill_the_gaps"))
 
     if request.method == "POST":
         username = request.form.get("uname")
         password = request.form.get("psw")
 
+        if not username.isalnum():
+            flash("Illegal characters in username")
+            return redirect(url_for("login"))
 
-        user = User(username, password)
-        if user.is_authenticated:
-            current_user = user
-            login_user(user)
-            flash('Logged in successfully.')
-            return redirect(url_for('fill_the_gaps'))
 
+
+        user_id, username, nickname, code = load_user_creds(username=username)
+
+        this_user = load_user(user_id)
+        flash(f"Trying to log in as user {user_id}. Password guessed {password} real password {this_user.password}")
+        flash(f"Trying to log in as user {user_id}. Username guessed {username} real username {this_user.username}")
+        if username == this_user.username and password == this_user.password:
+            login_user(this_user)
+            flash('Logged in successfully ' + username)
+            redirect(url_for('fill_the_gaps'))
         else:
-            flash("Invalid username / password", "error")
+            flash('Login Unsuccessful.')
 
     return render_template("login.html")
 
