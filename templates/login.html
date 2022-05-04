@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<title>Examinator</title>
+
+<!-- VO to DO
+
+1. Skip question button
+2. Add 2012/2011 papers
+3. Add 2015 mock paper + create mark scheme -- done 19/05
+4. Automatically markup code questions in Python IDE style formatting
+5. GCSE mode
+6. COMP2 mode
+7. A Level IT mode
+
+-->
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+        integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+        crossorigin="anonymous"></script>
+
+<link href='https://fonts.googleapis.com/css?family=Nunito|Codystar|Open+Sans' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+<link href="static/bootstrap-tagsinput.css" rel="stylesheet" type="text/css">
+<script src="static/bootstrap-tagsinput.js"></script>
+<link href="static/examinatorstyles.css" rel="stylesheet" type="text/css">
+
+
+</head>
+
+<body style="background-color:#{% if mode=='question' %}F3FFF3{% elif mode == 'assess' %}F3FFF3{% else %}DDFFFF{% endif %}">
+
+
+
+
+<div class="container-fluid">
+
+	<!-- formContainer - holds answer input, answer display, check Answer/next question buttons and award marks dropdown -->
+	<form method="POST" action="/login">
+		<div id="error"></div>
+
+		<!-- start of top bar -->
+        <div class="row">
+			<!-- banner  -->
+
+            <div class="col-lg-6 col-sm-9">
+                <div id="bannerContainer">
+                    <header><h1>Examinator V3</h1>
+                        <h3 class="tagline">A revision tool for the reflective Computer Science student</h3>
+                    </header>
+                </div>
+            </div>
+
+
+
+            <div class="col-lg-6 col-sm-3" id="login_container">
+
+
+                <div class="row">
+                    <label class="login_element" for="uname"><b>Username:</b></label>
+                    <input class="login_element" type="text" placeholder="Enter Username" name="uname" required>
+                </div>
+                <div class="row">
+                    <label class="login_element" for="psw"><b>Password:</b></label>
+                    <input class="login_element" type="password" placeholder="Enter Password" name="psw" required>
+                </div>
+                <div class="row">
+                    <label class="login_element"></label>
+                    <button  class="login_element" type="submit">Login</button>
+                </div>
+            </div>
+        </div>
+
+    </form>
+
+</div>
+
+</body>
+
+</html>
+<script>
+	let messages = [];
+	{% for msg in get_flashed_messages()|reverse %}
+	messages.push(unescape("{{ msg }}"));
+	{% endfor %}
+	flash_message(messages)
+
+</script>
+
+
