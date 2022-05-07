@@ -8,7 +8,7 @@ from random import choice, randrange, shuffle, sample, randint
 from uuid import uuid4
 
 from database import write_session_to_db, get_question_data,save_answers_to_db, read_leaderboard_from_db, \
-                     get_misnomers, authenticate_user, load_user_creds, load_question_data_to_db
+                     get_misnomers, authenticate_user, load_user_creds, sync_data_with_db
 
 from waitress import serve
 from user import User
@@ -239,10 +239,10 @@ def home():
     return redirect(url_for(("login")))
 
 
-@app.route("/gspread_load")
-def gspread_load():
-    if current_user.is_admin:
-        return load_question_data_to_db()
+@app.route("/db_sync")
+def db_sync():
+    if True: # current_user.is_admin:
+        return sync_data_with_db()
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -265,8 +265,8 @@ def login():
         user_id, username, nickname, code = load_user_creds(username=username)
 
         this_user = load_user(user_id)
-        flash(f"Trying to log in as user {user_id}. Password guessed {password} real password {this_user.password}")
-        flash(f"Trying to log in as user {user_id}. Username guessed {username} real username {this_user.username}")
+
+
         if username == this_user.username and password == this_user.password:
             login_user(this_user)
             flash('Logged in successfully ' + username)

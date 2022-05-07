@@ -84,17 +84,12 @@ def query_db(query):
         return None
 
 
-def test():
 
-    args = (9234, 'bob')
-    args = (9234, 'bob')
-
-    query_db('INSERT INTO users VALUES (?, ?, "werfwe")', args)
-
-def load_question_data_to_db():
-    """Connects to google sheet and updates question data
+def sync_data_with_db():
+    """Connects to google sheet and updates question data / answer data
     run periodically according to quota"""
 
+    # sync spreadsheet question data with database
     query_db("DELETE FROM questions")
 
     gc = gspread.service_account(filename="secret/cram-revision-app-5da8bea462ae.json")
@@ -115,7 +110,69 @@ def load_question_data_to_db():
     query_db(q)
 
     question_data = query_db("SELECT * FROM questions")
-    return Markup("<p>Data added:</p><table>" + "".join(["<tr>" + "".join([f"<td>{col}</td>" for col in row])+"</tr>" for row in question_data]) + "</table>")
+    question_data_conf = "<p>Data added:</p><table>" + "".join(["<tr>" + "".join([f"<td>{col}</td>" for col in row])+ \
+                                                                "</tr>" for row in question_data]) + "</table>"
+
+    # sync database answer data with spreadsheet
+    answer_data_conf = ""
+
+    ss = sh.worksheet('answers')
+    ss_answers = ss.get('A2:D1000')
+
+    next_ss_row = len(ss_answers) + 1
+
+    print("The next free row is", next_ss_row)
+
+
+    q = 'INSERT OR IGNORE INTO answers VALUES '
+    count = 0
+    for row in ss_answers:
+        answer, correct, user_id, timestamp = row
+        q += f'("{answer}", {correct}, {user_id}, {timestamp}),\n'
+        count += 1
+
+    q = q[:-2]
+    query_db(q)
+
+    answer_data_conf += f"Wrote (or ignored) {count} answers to the db.\n"
+
+
+    q = "SELECT * FROM answers"
+    db_answers = query_db(q)
+
+
+
+
+    answer_data_conf += "Backed up the following answers from the db:<br><ul>"
+
+    all_answers = list(ss_answers) + list(db_answers)
+    log_pks = set()
+    remove_records = set()
+    for index, row in enumerate(list(all_answers)):
+        pk = (int(row[-1]), int(row[-2]))
+        if pk not in log_pks:
+            answer_data_conf += "<li>" + "\t".join(str(i) for i in row) + "</li>"
+        else:
+            all_answers[index] = None
+
+        log_pks.add(pk)
+
+    print("All answers are:")
+    print(all_answers)
+    print("i need to remove")
+    print(remove_records)
+
+    all_answers.remove(None)
+
+    answer_data_conf += "</ul>"
+
+    ss.update(f'A1', all_answers)
+
+
+
+    return Markup(question_data_conf + answer_data_conf)
+
+
 
 
 
