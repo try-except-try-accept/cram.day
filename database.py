@@ -259,7 +259,7 @@ def get_question_data(user_id):
     WHERE questions.question_id = sessions.question_id
     AND sessions.user_id = 0
     AND sessions.in_use_flag = 1
-    AND (gen_count = NULL OR gen_count > 0)
+    AND (sessions.gen_count IS NULL OR sessions.gen_count > 0)
     ORDER BY Random()
     LIMIT 1;'''
 
@@ -313,7 +313,7 @@ def read_leaderboard_from_db():
     HAVING
         user = answers.user_id
     ORDER BY overall DESC
-    LIMIT 10'''
+    LIMIT 25'''
 
     overall_leaderboard = query_db(q)
 
@@ -333,7 +333,7 @@ GROUP BY
 HAVING
 	user = answers.user_id
 ORDER BY overall DESC
-LIMIT 10'''
+LIMIT 25'''
 
     last_hour_leaderboard = query_db(q2)
 

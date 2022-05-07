@@ -72,7 +72,10 @@ def create_question():
         question, gaps = question_data
 
         replacements = []
-        kw = gaps.replace(" ", ",").replace(",,", ",").split(",")
+
+        kw = gaps.replace("\,", "/////")
+        kw = kw.split(", ")
+        kw = [w.replace("/////", ",") for w in kw]
 
         for i in range(session['difficulty']):
             replacements.append(kw.pop(randrange(0, len(kw))))
@@ -84,7 +87,14 @@ def create_question():
         i = 0
         question_tokens = question.split(" ")
 
+        skip = 0
+
         for y, word in enumerate(question_tokens):
+            if skip:
+                skip -= 1
+                continue
+
+            replacement_added = False
             for rep_word in replacements:
 
                 if rep_word in word:
@@ -92,9 +102,36 @@ def create_question():
                     add_field = " " + word.replace(rep_word, f'<input class="gap_textfield" type="text" name="answer{i}" required'
                                                              f'>') + " "
                     html_out += add_field
+                    replacement_added = True
                     i += 1
-                else:
-                    html_out += " " + word
+                elif " " in rep_word:
+                    parts = rep_word.split(" ")
+                    multi_part_gap_found = True
+                    print("Rep word is", parts)
+                    for x in range(len(parts)):
+                        next_token_index = y+x
+                        try:
+                            print(f"Checking to see if {question_tokens[next_token_index]} matches {parts[x]}")
+                        except:
+                            pass
+                        if next_token_index >= len(question_tokens) or parts[x] != question_tokens[next_token_index]:
+                            multi_part_gap_found = False
+                            break
+                    if multi_part_gap_found:
+                        print("Found!!!!")
+                        session['correct'].append(rep_word)
+                        skip = x
+
+                        add_field = " " + f'<input class="gap_textfield" type="text" name="answer{i}" required>'
+                        html_out += add_field
+                        replacement_added = True
+
+
+
+            if not replacement_added:
+                html_out += " " + word
+
+            print("html out is currently", html_out)
 
 
         session['question'] = question
@@ -121,12 +158,14 @@ def submit_answer():
         html_out = ""
         for correct_answer in replacements:
 
-            if len(answers) and correct_answer == answers.pop(0):
+            if len(answers) and correct_answer.lower() == answers.pop(0).lower():
                 feedback.append(None)
                 score.append(1)
             else:
                 feedback.append(correct_answer)
                 score.append(0)
+
+        print("The score was", score)
 
         save_answers_to_db(current_user.user_id, answers_copy, score)
         session['scores'].append(round(sum(score)/len(score)))
@@ -160,7 +199,12 @@ def begin_session():
 
             write_session_to_db(topics, q_repeat, current_user.user_id)
 
-    return create_question()
+    q = create_question()
+    if q == 404:
+        flash("No questions found.")
+        return ""
+    else:
+        return q
 
 
 #############################################################################

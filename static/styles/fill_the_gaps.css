@@ -21,11 +21,18 @@ header, #config
 
 }
 
-.xeout
+.fadeout
 {
   transition-property: opacity, 0;
   transition-duration: 2s;
   transition-delay: 1s;
+}
+@keyframes fadeout
+{
+
+from{opacity: 1;}
+to {opacity: 0;}
+
 }
 
 
