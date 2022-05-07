@@ -68,7 +68,7 @@ def create_question():
 
         if question_data is None:
             flash("You've answered all questions according to your current settings.", "error")
-            return redirect(url_for("fill_the_gaps"))
+            return 404
         question, gaps = question_data
 
         replacements = []
@@ -145,8 +145,8 @@ def submit_answer():
 
 #############################################################################
 
-@app.route("/get_question", methods=["GET", "POST"])
-def get_question():
+@app.route("/begin_session", methods=["GET", "POST"])
+def begin_session():
     if current_user.is_authenticated:
         out = "<p>So you want to study</p>"
         if request.method == "POST":

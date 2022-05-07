@@ -45,9 +45,10 @@
 
                     <label for="course">Select course:</label>
                     <select name="course" id="course">
+                        <option value="a2">CIE A2 Level</option>
                       <option value="igcse">Oxford AQA IGCSE</option>
-                      <option value="a2">CIE A2 Level</option>
                       <option value="as">CIE AS Level</option>
+                        <option value="ks3">KS3 Computing</option>
                     </select>
 
 
@@ -59,6 +60,17 @@
                     <button id="hint_button" onclick="get_hints();" class="btn btn-dark" type="button">Show hints</button>
                     <button id="check_button" onclick="submit_answer();" class="btn btn-dark" type="button">Check</button>
 
+                </div>
+                <div id="flashes">
+                    {% with messages = get_flashed_messages() %}
+  {% if messages %}
+
+    {% for message in messages %}
+      <p class="fadeout">{{ message }}</p>
+    {% endfor %}
+
+  {% endif %}
+{% endwith %}
                 </div>
                 <div id="question"></div>
 
@@ -99,7 +111,7 @@
                 </div>
 
                 <div class="modal-footer">
-                    <input type="submit" onclick="get_question();" data-toggle="modal" class="btn btn-success"
+                    <input type="submit" onclick="begin_session();" data-toggle="modal" class="btn btn-success"
                            id="get_question_btn" value="Begin"/>
                 </div>
             </div>

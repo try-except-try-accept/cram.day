@@ -54,6 +54,38 @@ A2_TOPICS = `13.1 User-defined data types
 20.1 Programming Paradigms
 20.2 File Processing and Exception Handling`.split("\n")
 
+AS_TOPICS = `1.1 Data representation
+1.2 Multimedia
+1.3 Compression
+2.1 Networks including the Internet
+3.1 Computers and their components
+3.2 Logic gates and logic circuits
+4.1 CPU architecture
+4.2 Assembly language
+4.3 Bit manipulation
+5.1 Operating system
+5.2 Language translators
+6.1 Data security
+6.2 Data integrity
+7.1 Ethics and ownership
+8.1 Database concepts
+8.2 Database management system (DBMS)
+8.3 Data Definition Language (DDL) and Data Manipulation Language (DML)
+9.1 Computational thinking skills
+9.2 Algorithms
+10.1 Data types and records
+10.2 Arrays
+10.3 Files
+10.4 Introduction to Abstract Data Types (ADT)
+11.1 Programming basics
+11.2 Constructs
+11.3 Structured programming
+12.1 Program development lifecycle
+12.2 Program design
+12.3 Program testing and maintenance`.split("\n")
+
+KS3_TOPICS = `Y9.3 Introduction to databases and SQL`.split("\n")
+
 const LEADERBOARD_SLOT_SIZE = 40;
 
 const LEADERBOARD_OFFSET = 0;
@@ -67,6 +99,8 @@ function get_topic_list()
     let offset = 1;
     if (course == "igcse") { source = IGCSE_TOPICS; }
     else if (course == "a2") { source = A2_TOPICS; offset = 40;}
+    else if (course == "as") { source = AS_TOPICS; offset = 55;}
+    else if (course == "ks3") { source = KS3_TOPICS; offset = 84;}
 
     let topic_checkbox_display = document.getElementById("topic_checkbox_display");
 
@@ -259,8 +293,10 @@ function animate_feedback(fb_anim, data)
     fb.css({"opacity":1, "top":"200px"});
 
     fb.fadeOut(0);
+    let next_question = data.next_question;
+    if (next_question == 404) { window.location.href  = "/fill_the_gaps"}
     fb.fadeIn(1000,
-        () => $("#question").html(data.next_question).fadeIn(100,
+        () => $("#question").html(next_question).fadeIn(100,
             () => fb.animate(anim_actions, 1000,  () => fb.hide()
             )
         )
@@ -483,7 +519,7 @@ function submit_answer()
 };
 
 
-function get_question()
+function begin_session()
 {
     let form_data = new FormData();
     topics = document.getElementsByClassName("topic_checkbox");
@@ -496,7 +532,7 @@ function get_question()
     form_data.append("q_repeat", document.getElementById("q_repeat").value);
     console.log(form_data);
 
-    fetch('/get_question',
+    fetch('/begin_session',
     {
         body:form_data,
         method:"post"

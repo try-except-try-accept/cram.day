@@ -20,7 +20,7 @@ def load_user_creds(user_id=None, username=None):
     else:
         result = query_db(f'SELECT user_id, username, nickname, code from users where user_id = "{user_id}"')
 
-    print(result)
+    #print(result)
 
     if result is None or len(result) == 0:
         return None
@@ -40,7 +40,7 @@ def authenticate_user(username, password):
 
     result = query_db(q)
 
-    print(result)
+    #print(result)
 
     if result is None or len(result) == 0:
         return None
@@ -100,13 +100,13 @@ def sync_data_with_db():
 
     q = "INSERT INTO questions (question_id, question, gaps, topic_index) VALUES "
     for row in data:
-        print(row)
+        #print(row)
         if row[4]:
             q +=  f'  ({row[0]}, "{row[1]}", "{row[2]}", "{row[3]}"),\n'
 
 
     q = q[:-2] + ";"
-    print(q)
+    #print(q)
     query_db(q)
 
     question_data = query_db("SELECT * FROM questions")
@@ -118,10 +118,6 @@ def sync_data_with_db():
 
     ss = sh.worksheet('answers')
     ss_answers = ss.get('A2:D1000')
-
-    next_ss_row = len(ss_answers) + 1
-
-    print("The next free row is", next_ss_row)
 
 
     q = 'INSERT OR IGNORE INTO answers VALUES '
@@ -157,12 +153,8 @@ def sync_data_with_db():
 
         log_pks.add(pk)
 
-    print("All answers are:")
-    print(all_answers)
-    print("i need to remove")
-    print(remove_records)
-
-    all_answers.remove(None)
+    if None in all_answers:
+        all_answers.remove(None)
 
     answer_data_conf += "</ul>"
 
@@ -180,7 +172,7 @@ def sync_data_with_db():
 def check_sanitised(topics=None, not_null_ids=None, null_ints=None):
     if topics:
         for t in topics:
-            if not t.replace(".", "").isdigit():
+            if not t.replace(".", "").replace("Y", "").isdigit():
                 print("invalid topic", t)
                 return False
 
@@ -225,9 +217,9 @@ FROM questions, sessions
 WHERE questions.topic_index IN ({topics})
 '''
 
-    print(q)
+    #print(q)
     query_db(q)
-    print(q2)
+    #print(q2)
     query_db(q2)
 
 def get_misnomers(correct):
@@ -243,7 +235,7 @@ def get_misnomers(correct):
         keywords += [word for word in row[0].split(", ")]
 
 
-    print(keywords)
+    #print(keywords)
 
     misnomers = sample(keywords, 10)
     for c in correct:
@@ -267,10 +259,16 @@ def get_question_data(user_id):
     WHERE questions.question_id = sessions.question_id
     AND sessions.user_id = 0
     AND sessions.in_use_flag = 1
+    AND (gen_count = NULL OR gen_count > 0)
     ORDER BY Random()
     LIMIT 1;'''
 
-    question_id, question_text, gaps, count = query_db(q)[0]
+    result = query_db(q)
+
+    if len(result) == 0 or result is None:
+        return None
+
+    question_id, question_text, gaps, count = result[0]
 
     if count is not None:
         count -= 1
