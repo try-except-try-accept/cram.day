@@ -251,10 +251,13 @@ function animate_feedback(fb_anim, data)
     if (fb_anim != -1) { anim_actions = {"top":fb_anim.toString(), "opacity":0} }
     else { anim_actions = {"left":"1000", "opacity":0} };
 
-    let fb =$("#feedback")
+    let fb = $("#feedback")
 
-    fb.css({"opacity":1, "top":"200px"});
+    console.log("Found feedback div", fb)
+
     fb.show();
+    fb.css({"opacity":1, "top":"200px"});
+
     fb.fadeOut(0);
     fb.fadeIn(1000,
         () => $("#question").html(data.next_question).fadeIn(100,
@@ -301,73 +304,141 @@ function remove_hints()
     }
 }
 
+
+function kill_non_text_elems()
+{
+    let images = document.getElementsByTagName("img")
+    let codes = document.getElementsByTagName("code")
+
+    for (var elem of images)
+    {
+        //elem.remove()
+        elem.animate({'opacity': "0"}, 100);
+    }
+
+//    for (var elem of codes)
+//    {
+//        //elem.remove()
+//        elem.animate({'opacity': "0"}, 100);
+//    }
+}
+
+function mark_element(child, feedback)
+{
+    let text_input_feedback = "";
+
+    if (child.getAttribute("class") == "gap_textfield")
+    {
+
+        let next_correct = feedback.pop(0);
+        console.log("next correct" + next_correct);
+
+        if (next_correct != null)
+        {
+           text_input_feedback = "✘" + child.value + "✔" + next_correct;
+           child.classList.add("incorrect");
+        }
+        else
+        {
+           text_input_feedback = "✔" + child.value;
+           child.classList.add("correct");
+        }
+
+
+    }
+    return text_input_feedback;
+}
+
 function process_feedback(feedback, scores)
 {
+
+    try
+    {
+        document.getElementById("feedback").remove()
+    }
+    catch (e) { console.log("no feedback div to remove ")}
+
+
 
     console.log("Feedback is");
     console.log(feedback);
     document.getElementById("hint_button").disabled = false;
-    feedback_div = document.getElementById("feedback");
-    question_div = document.getElementById("question");
 
-    feedback_div.innerHTML = "";
+    let question_div = document.getElementById("question");
 
-    for (let child of question_div.childNodes)
+    let parents = document.querySelectorAll("#question, code")
+
+
+
+
+//
+//    for (let parent of parents)
+//    {
+//        for (let child of parent.childNodes)
+//        {
+//            let new_node = child.cloneNode()
+//            try
+//            {
+//
+//                text_input_feedback = mark_element(child, feedback)
+//                if (text_input_feedback != "") { new_node.value = text_input_feedback }
+//
+//
+//            }
+//            catch (e) { console.log("problemmm" + e + " " + child.nodeName)}
+//
+//            feedback_div.appendChild(new_node);
+//        }
+//    }
+
+    // copy all nodes and sub nodes from question into feedback
+    feedback_div = question_div.cloneNode(deep=true);
+    document.getElementById("quiz").appendChild(feedback_div);
+    feedback_div.setAttribute("id", "feedback")
+    console.log("feedback div has contents", feedback_div.textContent)
+    // find textbox in feedback
+    answer_boxes = feedback_div.querySelectorAll("input")
+
+
+    for (let answer_box of answer_boxes)
     {
-        let new_node = child.cloneNode()
-        try
+        console.log("answer box has content", answer_box.value)
+        answer_box.value = mark_element(answer_box, feedback)
+        console.log("answer box now has content", answer_box.value)
+    }
+
+    function disable_children(node)
+    {
+        for (n of node.childNodes)
         {
-            if (child.getAttribute("class") == "gap_textfield")
+            try
             {
-
-                let next_correct = feedback.pop(0);
-                console.log("next correct" + next_correct);
-                let text_input_feedback = "";
-                if (next_correct != null)
-                {
-                   text_input_feedback = "✘" + child.value + "✔" + next_correct;
-
-                }
-                else
-                {
-                   text_input_feedback = "✔" + child.value;
-                }
-
-                new_node.value = text_input_feedback;
-
+            n.setAttribute("disabled", true)
             }
+            catch (e) { }
+            disable_children(n)
         }
-        catch (e) { console.log("problemmm" + e)}
-
-        feedback_div.appendChild(new_node);
     }
 
-    for (let i=0; i<feedback_div.children.length; i++)
-    {
-        let element = feedback_div.children[i];
-        let grading = scores[i];
-
-        element.setAttribute("disabled", true);
-        let colour = "incorrect";
-        if (grading) { colour = "correct"}
-        element.classList.add(colour);
-    }
+    disable_children(feedback_div);
 
 
     const average = array => array.reduce( ( p, c ) => p + c, 0 ) / array.length;
 
-
+    //document.getElementsByTagName("input")[0].focus();
     if (average(scores) == 1) { return 0 }
     else if (average(scores) == 0) { return BOTTOM_OF_SCREEN }
     else { return -1}
 
-    document.getElementsByTagName("input")[0].focus();
+
 
 
 }
 
 function submit_answer()
 {
+
+    kill_non_text_elems();
     let form_data = new FormData();
     answers = document.getElementsByClassName("gap_textfield");
     answers_given = [];

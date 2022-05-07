@@ -241,7 +241,7 @@ def home():
 
 @app.route("/db_sync")
 def db_sync():
-    if True: # current_user.is_admin:
+    if current_user.is_admin:
         return sync_data_with_db()
 
 @app.route("/login", methods=["GET", "POST"])

@@ -1,8 +1,17 @@
+html {
+  overflow-y: scroll;
+}
+
 body
 {
-    text-align:center;
+
     margin-left:auto;
     margin-right:auto;
+}
+
+header, #config
+{
+    text-align:center;
 }
 
 .hint
@@ -48,13 +57,15 @@ header
 #quiz
 {
 
-    left:-webkit-calc(100vw * 0.16666666666666666);
-    left:-moz-calc(100vw * 0.16666666666666666);
-    left:calc(100vw * 0.16666666666666666);
-    width:-webkit-calc(100vw * 0.6666666666666666);
-    width:-moz-calc(100vw * 0.6666666666666666);
-    width:calc(100vw * 0.6666666666666666);
+    left:-webkit-calc(100vw * 0.25);
+    left:-moz-calc(100vw * 0.25);
+    left:calc(100vw * 0.25);
+    width:-webkit-calc(100vw * 0.5);
+    width:-moz-calc(100vw * 0.5);
+    width:calc(100vw * 0.5);
     position:absolute;
+
+
 }
 
 #feedback, #question
