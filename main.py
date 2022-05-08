@@ -348,17 +348,22 @@ def login():
 
 
 
-        user_id, username, nickname, code = load_user_creds(username=username)
+        creds = load_user_creds(username=username)
 
-        this_user = load_user(user_id)
-
-
-        if username == this_user.username and password == this_user.password:
-            login_user(this_user)
-            flash('Logged in successfully ' + username + " - now choose your topics!")
-            return redirect(url_for('fill_the_gaps'))
-        else:
+        if creds is None:
             flash('Login Unsuccessful.')
+        else:
+            user_id, username, nickname, code = creds
+
+            this_user = load_user(user_id)
+
+
+            if username == this_user.username and password == this_user.password:
+                login_user(this_user)
+                flash('Logged in successfully ' + username + " - now choose your topics!")
+                return redirect(url_for('fill_the_gaps'))
+            else:
+                flash('Login Unsuccessful.')
 
     return render_template("login.html")
 
