@@ -113,10 +113,13 @@ function toggle_leaderboard()
 
 function display_message(msg)
 {
-    let message_display = document.createElement("div");
-    message_display.innerHTML = "<p>" + msg + "</p>";
-    document.body.appendChild(message_display);
-    message_display.classList.add("message");
+    if (msg.length)
+    {
+        let message_display = document.createElement("div");
+        message_display.innerHTML = "<p>" + msg + "</p>";
+        document.body.appendChild(message_display);
+        message_display.classList.add("message");
+    }
 }
 
 function get_topic_list()
@@ -410,7 +413,7 @@ function mark_element(child, feedback_queue)
 
         if (next_correct != null)
         {
-           text_input_feedback = "✘" + child.value + "✔" + next_correct;
+           text_input_feedback = "✘" + next_correct;
            child.classList.add("incorrect");
         }
         else

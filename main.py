@@ -102,7 +102,7 @@ def create_question():
 
                 if rep_word in word:
                     session['correct'].append(rep_word)
-                    add_field = " " + word.replace(rep_word, f'<input class="gap_textfield" type="text" name="answer{i}" required'
+                    add_field = " " + word.replace(rep_word, f'<input autocomplete="off" class="gap_textfield" type="text" name="answer{i}" required'
                                                              f'>') + " "
                     html_out += add_field
                     replacement_added = True
@@ -122,7 +122,7 @@ def create_question():
                         session['correct'].append(rep_word)
                         skip = x
 
-                        add_field = " " + f'<input class="gap_textfield" type="text" name="answer{i}" required>'
+                        add_field = " " + f'<input autocomplete="off" class="gap_textfield" type="text" name="answer{i}" required>'
                         html_out += add_field
                         replacement_added = True
 
@@ -164,30 +164,49 @@ def submit_answer():
 
             if len(answers) and correct_answer.lower() == answers.pop(0).lower():
                 feedback.append(None)
-                score.append(1)
+                result = 1
+
+
             else:
                 feedback.append(correct_answer)
-                score.append(0)
+                result = 0
+
+            score.append(result)
+            session['win_streak'].append(result)
+            if len(session['win_streak']) == 11:
+                session['win_streak'].pop(0)
+            session['lose_streak'].append(result)
+            if len(session['lose_streak']) == 6:
+                session['lose_streak'].pop(0)
 
         print("The score was", score)
 
         save_answers_to_db(current_user.user_id, answers_copy, score)
         session['scores'].append(round(sum(score)/len(score)))
 
-        last_10 = session['scores'][-10:]
-        last_5 = session['scores'][-5:]
+
 
         message = ""
 
-        print("last 10", last_10)
 
-        if len(last_10) >= 10 and sum(last_10) == 10:
-            message = "10 correct in a row! :)"
-            session['difficulty'] += 1
-        elif len(last_5) >= 5 and sum(last_5) == 0:
+
+        win_streak = session['win_streak']
+        lose_streak = session['lose_streak']
+
+        print("win streak is", win_streak)
+        print("lose streak is", lose_streak)
+
+        if len(lose_streak) == 5 and sum(lose_streak) == 0:
             message = "5 incorrect in a row! :("
             if session['difficulty'] > 1:
                 session['difficulty'] -= 1
+            session['lose_streak'] = []
+
+        if len(win_streak) == 10 and sum(win_streak) == 10:
+            message = "10 correct in a row! :)"
+            session['difficulty'] += 1
+            session['win_streak'] = []
+
 
         overall = str(round(sum(session['scores']) / len(session['scores']), 2) * 100) + "%"
         response = {'feedback':feedback,
@@ -237,6 +256,8 @@ def fill_the_gaps():
         if session.get('scores') is None:
             session['scores'] = []
             session['difficulty'] = 1
+            session['win_streak'] = []
+            session['lose_streak'] = []
 
 
         return render_template("fill_the_gaps.html")
