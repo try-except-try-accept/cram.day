@@ -283,9 +283,8 @@ def get_hints():
         for h in hints:
             this_hint = {}
             this_hint['text'] = h + "... ?"
-            this_hint['colour'] = "#" + "".join([hex(randrange(25, 255))[2:].zfill(2) for i in range(3)])
-            this_hint['x'] = randrange(0, 800)
-            this_hint['y'] = randrange(400, 800)
+            this_hint['colour'] = "#" + "".join([hex(randrange(200, 255))[2:].zfill(2) for i in range(3)])
+
             final_hints.append(this_hint)
             print(final_hints)
 

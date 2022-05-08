@@ -20,9 +20,11 @@
 
     <link href="static/styles/fill_the_gaps.css" rel="stylesheet" type="text/css">
 
+ 
 
 </head>
 <body>
+
 
     <header>
         <h1>C.R.A.M</h1>
@@ -38,7 +40,7 @@
 
         <div id="quiz">
 
-                <div id="score_display"></div>
+
 
 
                 <div id="config">
@@ -62,15 +64,17 @@
 
                 </div>
 
-                    {% with messages = get_flashed_messages() %}
+                <div id="message_display">
+                        {% with messages = get_flashed_messages() %}
                         {% if messages %}
-
                             {% for message in messages %}
-                              <div class="message">{{ message }}</div>
+                              <p class="message">{{ message }}</p>
                             {% endfor %}
 
                           {% endif %}
                         {% endwith %}
+
+                </div>
 
                 <div id="question"></div>
 

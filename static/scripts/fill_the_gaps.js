@@ -115,9 +115,9 @@ function display_message(msg)
 {
     if (msg.length)
     {
-        let message_display = document.createElement("div");
+        let message_display = document.createElement("p");
         message_display.innerHTML = "<p>" + msg + "</p>";
-        document.body.appendChild(message_display);
+        document.getElementById("message_display").appendChild(message_display);
         message_display.classList.add("message");
     }
 }
@@ -355,14 +355,17 @@ function process_hints(hints)
          let new_hint = document.createElement("div")
          new_hint.innerHTML = h.text;
          new_hint.classList.add("hint")
-         new_hint.style.top = h.y.toString() + "px";
-         new_hint.style.left = ((window.screen.width * (1/6)) + h.x).toString() + "px";
-         new_hint.style.color = h.colour;
+         new_hint.style.top = (200+Math.floor(Math.random() * (window.innerHeight-400))).toString() + "px";
+         new_hint.style.left = (200+Math.floor(Math.random() * (window.innerWidth-400))).toString() + "px";
+         new_hint.style.backgroundColor = h.colour;
          document.getElementsByTagName("body")[0].appendChild(new_hint);
+
+
+
 
          new_hint.opacity = 1;
 
-        $(new_hint).fadeOut(5000, function() {
+        $(new_hint).fadeOut(3 * feedback_speed, function() {
             $(this).remove();
         });
     }
