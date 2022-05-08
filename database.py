@@ -210,6 +210,11 @@ SET in_use_flag = CASE WHEN questions.topic_index IN ({topics}) THEN 1 ELSE 0 EN
 FROM questions
 WHERE sessions.user_id = {user_id} AND questions.question_id = sessions.question_id;'''
 
+    q = f'''UPDATE sessions
+SET in_use_flag = CASE WHEN question_id IN (SELECT question_id FROM questions WHERE topic_index in ({topics}))
+THEN 1 ELSE 0 END, gen_count = {q_repeat}
+WHERE sessions.user_id = {user_id}'''
+
     q2 = f'''
 INSERT OR IGNORE INTO sessions (user_id, question_id, in_use_flag, gen_count)
 SELECT {user_id}, questions.question_id, 1, {q_repeat}
@@ -254,10 +259,10 @@ def get_misnomers(correct):
 
 def get_question_data(user_id):
     """Generates a question and updates session table"""
-    q = '''SELECT questions.question_id, questions.question, questions.gaps, sessions.gen_count
+    q = f'''SELECT questions.question_id, questions.question, questions.gaps, sessions.gen_count
     FROM questions, sessions
     WHERE questions.question_id = sessions.question_id
-    AND sessions.user_id = 0
+    AND sessions.user_id = {user_id}
     AND sessions.in_use_flag = 1
     AND (sessions.gen_count IS NULL OR sessions.gen_count > 0)
     ORDER BY Random()
