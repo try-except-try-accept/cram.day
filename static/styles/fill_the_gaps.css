@@ -1,5 +1,6 @@
 html {
-  overflow-y: scroll;
+  overflow-y: hidden;
+  overflow-x: hidden;
 }
 
 body
@@ -7,6 +8,7 @@ body
 
     margin-left:auto;
     margin-right:auto;
+    overflow-x: hidden;
 }
 
 header, #config
@@ -29,11 +31,23 @@ header, #config
 }
 @keyframes fadeout
 {
-
 from{opacity: 1;}
 to {opacity: 0;}
-
 }
+
+.fadein
+{
+  opacity:0;
+  transition-property: opacity, 0;
+  transition-duration: 2s;
+  transition-delay: 1s;
+}
+@keyframes fadein
+{
+from{opacity: 0;}
+to {opacity: 1;}
+}
+
 
 
 header
@@ -72,7 +86,6 @@ header
     width:calc(100vw * 0.5);
     position:absolute;
 
-
 }
 
 #feedback, #question
@@ -109,11 +122,13 @@ header
 {
     background-color:#4BB543;
     color:white;
+
 }
 .incorrect
 {
     background-color:#B33A3A;
     color:white;
+
 }
 
 #overall_leaderboard, #last_hour_leaderboard
@@ -166,4 +181,43 @@ h2
 .indent
 {
     text-indent:1em;
+}
+
+
+.message
+{
+  width: 100px;
+  border-radius: 25px;
+
+  text-align:center;
+  vertical-align:middle;
+  top: 400px;
+  opacity:0;
+  background-color: yellow;
+  border: thick black solid;
+  position: absolute;
+  animation-name: banner;
+  animation-duration: 4s;
+  overflow-x: hidden;
+
+}
+
+@keyframes banner {
+  0%   {left:0px; opacity:1;}
+
+  99%  {opacity:1;}
+  100% {left:calc(100vw * 1); opacity:0;}
+}
+
+
+footer {
+   position:absolute;
+   bottom:0;
+   width:100%;
+   height:30px;   /* Height of the footer */
+   background:#111111;
+   color:white;
+   text-align:center;
+   font-size:1em;
+
 }

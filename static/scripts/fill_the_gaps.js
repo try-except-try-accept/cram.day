@@ -92,6 +92,16 @@ const LEADERBOARD_OFFSET = 0;
 
 BOTTOM_OF_SCREEN = window.screen.height - 300;
 
+feedback_speed = 1000;
+
+function display_message(msg)
+{
+    let message_display = document.createElement("div");
+    message_display.innerHTML = "<p>" + msg + "</p>";
+    document.body.appendChild(message_display);
+    message_display.classList.add("message");
+}
+
 function get_topic_list()
 {
 
@@ -283,28 +293,38 @@ function animate_feedback(fb_anim, data)
     console.log("feedback anim");
     console.log(fb_anim);
     if (fb_anim != -1) { anim_actions = {"top":fb_anim.toString(), "opacity":0} }
-    else { anim_actions = {"left":"1000", "opacity":0} };
+    else { anim_actions = {"opacity":0} };
 
     let fb = $("#feedback")
 
     console.log("Found feedback div", fb)
 
-    fb.show();
-    fb.css({"opacity":1, "top":"200px"});
 
+
+    fb.css({"opacity":1, "top":"200px"});
+    fb.show();
     fb.fadeOut(0);
     let next_question = data.next_question;
     if (next_question == 404) { window.location.href  = "/fill_the_gaps"}
+
+
+
     fb.fadeIn(1000,
         () => $("#question").html(next_question).fadeIn(100,
-            () => fb.animate(anim_actions, 1000,  () => fb.hide()
+            () => fb.animate(anim_actions, feedback_speed,  () => fb.hide()
             )
         )
     );
 
 
 
+
+
 }
+
+
+
+
 
 
 function process_hints(hints)
@@ -359,14 +379,16 @@ function kill_non_text_elems()
 //    }
 }
 
-function mark_element(child, feedback)
+function mark_element(child, feedback_queue)
 {
     let text_input_feedback = "";
+
+    console.log("Feedback marking with is", feedback_queue)
 
     if (child.getAttribute("class") == "gap_textfield")
     {
 
-        let next_correct = feedback.pop(0);
+        let next_correct = feedback_queue.shift();
         console.log("next correct" + next_correct);
 
         if (next_correct != null)
@@ -382,7 +404,7 @@ function mark_element(child, feedback)
 
 
     }
-    return text_input_feedback;
+    return feedback_queue, text_input_feedback;
 }
 
 function process_feedback(feedback, scores)
@@ -390,9 +412,16 @@ function process_feedback(feedback, scores)
 
     try
     {
-        document.getElementById("feedback").remove()
+        let feedback_div = document.getElementById("feedback");
+
+        for (let elem of feedback_div.querySelectorAll(".gap_textfield"))
+        {
+            elem.remove();
+        }
+        document.getElementById("quiz").removeChild(feedback_div);
+        feedback_div.remove()
     }
-    catch (e) { console.log("no feedback div to remove ")}
+    catch (e) { console.log(e, "problem removing fb div") }
 
 
 
@@ -431,6 +460,7 @@ function process_feedback(feedback, scores)
     feedback_div = question_div.cloneNode(deep=true);
     document.getElementById("quiz").appendChild(feedback_div);
     feedback_div.setAttribute("id", "feedback")
+
     console.log("feedback div has contents", feedback_div.textContent)
     // find textbox in feedback
     answer_boxes = feedback_div.querySelectorAll("input")
@@ -438,9 +468,10 @@ function process_feedback(feedback, scores)
 
     for (let answer_box of answer_boxes)
     {
-        console.log("answer box has content", answer_box.value)
-        answer_box.value = mark_element(answer_box, feedback)
-        console.log("answer box now has content", answer_box.value)
+        console.log("answer box has content", answer_box.value);
+        feedback, answer_box.value = mark_element(answer_box, feedback);
+        console.log("answer box now has content", answer_box.value);
+        answer_box.name = "";
     }
 
     function disable_children(node)
@@ -464,7 +495,7 @@ function process_feedback(feedback, scores)
     //document.getElementsByTagName("input")[0].focus();
     if (average(scores) == 1) { return 0 }
     else if (average(scores) == 0) { return BOTTOM_OF_SCREEN }
-    else { return -1}
+    else {return -1}
 
 
 
@@ -476,7 +507,8 @@ function submit_answer()
 
     kill_non_text_elems();
     let form_data = new FormData();
-    answers = document.getElementsByClassName("gap_textfield");
+    question_div = document.getElementById("question")
+    answers = question.querySelectorAll(".gap_textfield");
     answers_given = [];
     for (let a of answers)
     {
@@ -504,7 +536,7 @@ function submit_answer()
     remove_hints();
     let fb_anim = process_feedback(data.feedback, data.scores);
 
-
+    display_message(data.message);
     update_score(data.total);
 
     update_leaderboard("overall", data.leaderboards);
@@ -548,6 +580,11 @@ function begin_session()
     }
     );
 };
+
+function adjust_feedback_speed()
+{
+    feedback_speed = parseInt(document.getElementById("feedback_speed_slider").value) * 500
+}
 
 function get_hints()
 {

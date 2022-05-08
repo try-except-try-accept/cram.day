@@ -82,7 +82,7 @@ def create_question():
 
         session['correct'] = []
         html_out = ""
-        print("replacements is", replacements)
+
 
         i = 0
         question_tokens = question.split(" ")
@@ -107,18 +107,15 @@ def create_question():
                 elif " " in rep_word:
                     parts = rep_word.split(" ")
                     multi_part_gap_found = True
-                    print("Rep word is", parts)
+
                     for x in range(len(parts)):
                         next_token_index = y+x
-                        try:
-                            print(f"Checking to see if {question_tokens[next_token_index]} matches {parts[x]}")
-                        except:
-                            pass
+
                         if next_token_index >= len(question_tokens) or parts[x] != question_tokens[next_token_index]:
                             multi_part_gap_found = False
                             break
                     if multi_part_gap_found:
-                        print("Found!!!!")
+
                         session['correct'].append(rep_word)
                         skip = x
 
@@ -131,7 +128,7 @@ def create_question():
             if not replacement_added:
                 html_out += " " + word
 
-            print("html out is currently", html_out)
+
 
 
         session['question'] = question
@@ -156,6 +153,10 @@ def submit_answer():
         score = []
         feedback = []
         html_out = ""
+
+        print("Received answers", answers)
+        print("Corrected answers", replacements)
+
         for correct_answer in replacements:
 
             if len(answers) and correct_answer.lower() == answers.pop(0).lower():
@@ -169,10 +170,27 @@ def submit_answer():
 
         save_answers_to_db(current_user.user_id, answers_copy, score)
         session['scores'].append(round(sum(score)/len(score)))
+
+        last_10 = session['scores'][-10:]
+        last_5 = session['scores'][-5:]
+
+        message = ""
+
+        print("last 10", last_10)
+
+        if len(last_10) >= 10 and sum(last_10) == 10:
+            message = "10 correct in a row! :)"
+            session['difficulty'] += 1
+        elif len(last_5) >= 5 and sum(last_5) == 0:
+            message = "5 incorrect in a row! :("
+            if session['difficulty'] > 1:
+                session['difficulty'] -= 1
+
         overall = str(round(sum(session['scores']) / len(session['scores']), 2) * 100) + "%"
         response = {'feedback':feedback,
                     'scores':score,
                     'total':overall,
+                    'message':message,
                     'next_question':create_question(),
                     'leaderboards':get_stats()}
 
@@ -215,7 +233,7 @@ def fill_the_gaps():
 
         if session.get('scores') is None:
             session['scores'] = []
-            session['difficulty'] = 1
+            session['difficulty'] = 3
 
 
         return render_template("fill_the_gaps.html")

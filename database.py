@@ -288,9 +288,9 @@ def save_answers_to_db(user_id, answers, scores):
 
     q = '''
 INSERT INTO answers (answer, correct, user_id, time_stamp) VALUES '''
+    ts = int(datetime.now().timestamp())
 
-
-    q += ",".join(f'("{answer}", {score}, "{user_id}", {int(datetime.now().timestamp())})' for answer, score in zip(answers, scores))
+    q += ",".join(f'("{answer}", {score}, "{user_id}", {ts + i + 1})' for i, (answer, score) in enumerate(zip(answers, scores)))
 
     query_db(q)
 
