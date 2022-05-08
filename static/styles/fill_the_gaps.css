@@ -97,6 +97,7 @@ header
 #choose_topics_modal
 {
     text-align:left;
+    font-size:0.8em;
 }
 
 header
@@ -159,11 +160,7 @@ header
     left:calc(100vw * (5/6));
 }
 
-#flashes
-{
-    color:purple;
-    text-align:center;
-}
+
 
 .leaderboard_slot
 {
@@ -186,25 +183,25 @@ h2
 
 .message
 {
-  width: 100px;
+  width: 200px;
   border-radius: 25px;
-
   text-align:center;
   vertical-align:middle;
   top: 400px;
   opacity:0;
-  background-color: yellow;
+  background-color: #EEEEEE;
   border: thick black solid;
   position: absolute;
   animation-name: banner;
-  animation-duration: 4s;
+  animation-duration: 6s;
   overflow-x: hidden;
-
+  left: calc(100vw * 0.666)
 }
 
 @keyframes banner {
-  0%   {left:0px; opacity:1;}
-
+  0%   {left:0px; opacity:0;}
+  30%   {left:0px; opacity:1;}
+  50%   {left:0px; opacity:1;}
   99%  {opacity:1;}
   100% {left:calc(100vw * 1); opacity:0;}
 }

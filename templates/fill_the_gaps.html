@@ -31,7 +31,7 @@
 
     <div class="container-fluid">
 
-        <div id="left_leaderboard">
+        <div id="left_leaderboard"  style="opacity:1">
             <h3>Overall:</h3>
             <div id="overall_leaderboard"></div>
         </div>
@@ -61,17 +61,17 @@
                     <button id="check_button" onclick="submit_answer();" class="btn btn-dark" type="button">Check</button>
 
                 </div>
-                <div id="flashes">
+
                     {% with messages = get_flashed_messages() %}
-  {% if messages %}
+                        {% if messages %}
 
-    {% for message in messages %}
-      <p class="fadeout">{{ message }}</p>
-    {% endfor %}
+                            {% for message in messages %}
+                              <div class="message">{{ message }}</div>
+                            {% endfor %}
 
-  {% endif %}
-{% endwith %}
-                </div>
+                          {% endif %}
+                        {% endwith %}
+
                 <div id="question"></div>
 
 
@@ -81,7 +81,7 @@
         </div>
 
 
-        <div id="right_leaderboard">
+        <div id="right_leaderboard" style="opacity:1">
             <h3>Last hour:</h3>
             <div id="last_hour_leaderboard"></div>
         </div>
@@ -125,6 +125,8 @@
     <footer>
         <label for="feedback_speed_slider">Adjust feedback animation speed:</label>
         <input id="feedback_speed_slider" type="range" min="1" max="10" onchange="adjust_feedback_speed()">
+
+        <button id="toggle_leaderboards" onclick="toggle_leaderboard()">hide leaderboards</button>
     </footer>
 
 

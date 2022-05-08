@@ -78,7 +78,10 @@ def create_question():
         kw = [w.replace("/////", ",") for w in kw]
 
         for i in range(session['difficulty']):
-            replacements.append(kw.pop(randrange(0, len(kw))))
+            try:
+                replacements.append(kw.pop(randrange(0, len(kw))))
+            except:
+                pass
 
         session['correct'] = []
         html_out = ""
@@ -233,7 +236,7 @@ def fill_the_gaps():
 
         if session.get('scores') is None:
             session['scores'] = []
-            session['difficulty'] = 3
+            session['difficulty'] = 1
 
 
         return render_template("fill_the_gaps.html")
@@ -331,7 +334,7 @@ def login():
 
         if username == this_user.username and password == this_user.password:
             login_user(this_user)
-            flash('Logged in successfully ' + username)
+            flash('Logged in successfully ' + username + " - now choose your topics!")
             return redirect(url_for('fill_the_gaps'))
         else:
             flash('Login Unsuccessful.')

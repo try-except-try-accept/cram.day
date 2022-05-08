@@ -94,6 +94,23 @@ BOTTOM_OF_SCREEN = window.screen.height - 300;
 
 feedback_speed = 1000;
 
+function toggle_leaderboard()
+{
+    let leaderboard = document.getElementById("left_leaderboard")
+    leaderboard.style.opacity = (parseInt(leaderboard.style.opacity) + 1) % 2
+    leaderboard = document.getElementById("right_leaderboard")
+    leaderboard.style.opacity = (parseInt(leaderboard.style.opacity) + 1) % 2
+    let toggle_btn = document.getElementById("toggle_leaderboards")
+    if (toggle_btn.textContent.indexOf("hide") == -1)
+    {
+        toggle_btn.textContent = "hide leaderboards"
+    }
+    else
+    {
+        toggle_btn.textContent = "show leaderboards"
+    }
+}
+
 function display_message(msg)
 {
     let message_display = document.createElement("div");
