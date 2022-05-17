@@ -50,7 +50,7 @@ def authenticate_user(username, password):
 
 
 
-def query_db(query):
+def query_db(query, catch=True, args=None):
 
     """Connect to and execute db query"""
 
@@ -63,10 +63,14 @@ def query_db(query):
 
     print("Executing")
     print(query)
+    if args:
+        print(args)
 
     try:
-
-        res = cursor.execute(query)
+        if args is None:
+            res = cursor.execute(query)
+        else:
+            res = cursor.execute(query, (*args,))
         if res is not None:
             res = res.fetchall()
 
@@ -79,10 +83,34 @@ def query_db(query):
     except Exception as e:
         conn.close()
         print(e)
+        if not catch:
+            input("problem")
 
 
         return None
 
+
+def test():
+
+    query_db('''INSERT OR IGNORE INTO answers VALUES (?, ?, ?, ?), (?, ?, ?, ?)''', args=("WalkHours", 1, 7, 1652146473, "WalkHours", 1, 7, 1652146474))
+
+    input("work?")
+    exit()
+
+
+def spreadsheet_to_query_placeholders(data):
+    """Create 1D list of query args and (?, ?) style placeholders"""
+    rows = len(data)
+    placeholder = "(?, ?, ?, ?), "
+    all_placeholders = (placeholder * rows)
+
+    all_data = []
+
+    for row in data:
+        all_data.extend(row)
+
+
+    return all_data, all_placeholders
 
 
 def sync_data_with_db():
@@ -96,18 +124,25 @@ def sync_data_with_db():
     sh = gc.open('CRAM Data Source')
 
     fill_gaps = sh.worksheet('fill_gaps')
-    data = fill_gaps.get('A2:E1000')
+    data = fill_gaps.get("A2:D1000")
 
     q = "INSERT INTO questions (question_id, question, gaps, topic_index) VALUES "
-    for row in data:
-        #print(row)
-        if row[4]:
-            q +=  f'  ({row[0]}, "{row[1]}", "{row[2]}", "{row[3]}"),\n'
+
+    datetime.fromtimestamp)
+
+    # for row in data:
+    #     #print(row)
+    #     if row[4]:
+    #         q +=  f'  ({row[0]}, "{row[1]}", "{row[2]}", "{row[3]}"),\n'
+
+    all_data, all_placeholders = spreadsheet_to_query_placeholders(data)
+
+    q += all_placeholders
 
 
     q = q[:-2] + ";"
-    #print(q)
-    query_db(q)
+
+    query_db(q, args=all_data)
 
     question_data = query_db("SELECT * FROM questions")
     question_data_conf = "<p>Data added:</p><table>" + "".join(["<tr>" + "".join([f"<td>{col}</td>" for col in row])+ \
@@ -117,20 +152,18 @@ def sync_data_with_db():
     answer_data_conf = ""
 
     ss = sh.worksheet('answers')
-    ss_answers = ss.get('A2:D1000')
+    ss_answers = ss.get_all_values()
 
+    all_data, all_placeholders = spreadsheet_to_query_placeholders(ss_answers)
 
     q = 'INSERT OR IGNORE INTO answers VALUES '
-    count = 0
-    for row in ss_answers:
-        answer, correct, user_id, timestamp = row
-        q += f'("{answer}", {correct}, {user_id}, {timestamp}),\n'
-        count += 1
+    q += all_placeholders
+
 
     q = q[:-2]
-    query_db(q)
+    query_db(q, args=all_data)
 
-    answer_data_conf += f"Wrote (or ignored) {count} answers to the db.\n"
+    answer_data_conf += f"Wrote (or ignored) {len(ss_answers)} answers to the db.\n"
 
 
     q = "SELECT * FROM answers"
@@ -347,4 +380,4 @@ LIMIT 25'''
 
 if __name__ == "__main__":
 
-    generate_question(0)
+    test()
