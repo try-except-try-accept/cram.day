@@ -122,6 +122,16 @@ function display_message(msg)
     }
 }
 
+function select_all_topics(agree)
+{
+    document.getElementById("topic_checkbox_display")
+
+    for (let checkbox of document.querySelectorAll(".topic_checkbox"))
+    {
+        checkbox.checked = agree;
+    }
+}
+
 function get_topic_list()
 {
 
@@ -133,8 +143,23 @@ function get_topic_list()
     else if (course == "ks3") { source = KS3_TOPICS; offset = 84;}
 
     let topic_checkbox_display = document.getElementById("topic_checkbox_display");
+    topic_checkbox_display.innerHTML = "";
+    topic_checkbox_display.innerHTML = topic_checkbox_display.innerHTML + `<br>
+                            <label for="q_repeat">Repeat each question </label>
 
-    topic_checkbox_display.innerHTML = '';
+                            <select name="q_repeat" id="q_repeat">
+                                <option value="infinity" selected>∞</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                            </select> times.<br>`;
 
     let count = offset
     for (let topic of source)
@@ -162,6 +187,7 @@ function get_topic_list()
         checkbox.setAttribute("index", count)
 
         label.setAttribute("for", "topic_"+topic_id);
+        label.setAttribute("class", "topic_label");
         label.innerHTML = topic;
 
         topic_checkbox_display.appendChild(checkbox_div);
@@ -171,22 +197,7 @@ function get_topic_list()
     }
 
 
-    topic_checkbox_display.innerHTML = topic_checkbox_display.innerHTML + `
-                            <label for="q_repeat">Repeat each question </label>
 
-                            <select name="q_repeat" id="q_repeat">
-                                <option value="infinity" selected>∞</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                                <option value="6">6</option>
-                                <option value="7">7</option>
-                                <option value="8">8</option>
-                                <option value="9">9</option>
-                                <option value="10">10</option>
-                            </select> times.`;
 
 }
 

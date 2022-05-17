@@ -128,7 +128,7 @@ def sync_data_with_db():
 
     q = "INSERT INTO questions (question_id, question, gaps, topic_index) VALUES "
 
-    datetime.fromtimestamp)
+
 
     # for row in data:
     #     #print(row)
