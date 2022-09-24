@@ -113,6 +113,11 @@ header
     font-size:0.8em;
 }
 
+#settings_modal_content
+{
+    margin-left:2em;
+}
+
 header
 
 {

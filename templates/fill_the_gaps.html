@@ -14,6 +14,9 @@
         integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
         crossorigin="anonymous"></script>
 
+<link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
+
     <script src="static/scripts/fill_the_gaps.js"></script>
 
 
@@ -70,6 +73,8 @@
 
                     <button id="hint_button" onclick="get_hints();" class="btn btn-dark" type="button">Show hints</button>
                     <button id="check_button" onclick="submit_answer();" class="btn btn-dark" type="button">Check</button>
+                    <button id="settings_button" class="btn btn-dark" type="button"
+                            data-toggle="modal" data-target="#settings_modal">Settings</button>
 
                 </div>
 
@@ -141,6 +146,43 @@
                 <div class="modal-footer">
                     <input type="submit" onclick="begin_session();" data-toggle="modal" class="btn btn-success"
                            id="get_question_btn" value="Begin"/>
+                </div>
+            </div>
+        </div>
+    </div>
+
+ <div id="settings_modal" class="modal fade" role="dialog">
+        <div class="settings_modal modal-dialog modal-xl">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div id="settings_modal_header" class="modal-header">
+                    <h4 class="modal-title">Settings:</h4>
+                </div>
+
+
+                <div id="settings_modal_content" class="modal-body">
+
+
+
+                    <form id="settings_chooser">
+                        <div class="checkbox">
+                            <label><input type="checkbox" name="eal_mode_toggle" data-toggle="toggle" {% if eal %}checked{% endif %}>EAL mode</label>
+                        </div>
+                        <div class="checkbox">
+                            <label><input type="checkbox" name="hide_non_topic_toggle" data-toggle="toggle" {% if hide_non_topic %}checked{% endif %}>Hide non-topic misnomers</label>
+                        </div>
+                        <div class="checkbox">
+                            <label><input type="checkbox" name="opt_out_toggle" data-toggle="toggle" {% if opt_out %}checked{% endif %}>Opt out of leaderboards completely</label>
+                        </div>
+
+
+                    </form>
+
+                </div>
+
+                <div class="modal-footer">
+                    <input type="submit" onclick="save_settings();" data-toggle="modal" class="btn btn-success"
+                           id="save_settings_btn" value="Save"/>
                 </div>
             </div>
         </div>

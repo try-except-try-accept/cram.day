@@ -347,6 +347,8 @@ def read_leaderboard_from_db():
        answers, users
     WHERE
         answers.user_id = users.user_id
+    AND
+        users.opt_out = 0
     GROUP BY
         users.user_id
     HAVING
@@ -366,9 +368,9 @@ FROM
    answers, users
 WHERE
 	answers.user_id = users.user_id
-
-
-	AND answers.time_stamp > {datetime.now().timestamp() - ONE_HOUR} 
+AND
+    users.opt_out = 0
+AND answers.time_stamp > {datetime.now().timestamp() - ONE_HOUR} 
 
 GROUP BY
 	users.user_id
@@ -381,6 +383,14 @@ LIMIT 25'''
 
     return overall_leaderboard, last_hour_leaderboard
 
+
+def save_settings_to_db(eal, non_topic, opt_out, user_id):
+    q = f"UPDATE users SET eal_mode={eal}, hide_non_topic={non_topic}, opt_out={opt_out} WHERE user_id = {user_id}"
+    query_db(q)
+
+def get_settings_from_db(user_id):
+    q = f"SELECT eal_mode, hide_non_topic, opt_out FROM users WHERE user_id = {user_id}"
+    return query_db(q)
 
 if __name__ == "__main__":
 

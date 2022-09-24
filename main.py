@@ -8,7 +8,9 @@ from random import choice, randrange, shuffle, sample, randint
 from uuid import uuid4
 
 from database import write_session_to_db, get_question_data,save_answers_to_db, read_leaderboard_from_db, \
-                     get_misnomers, authenticate_user, load_user_creds, sync_data_with_db
+                     get_misnomers, authenticate_user, load_user_creds, sync_data_with_db, save_settings_to_db, \
+                     get_settings_from_db
+
 
 from waitress import serve
 from user import User
@@ -260,8 +262,11 @@ def fill_the_gaps():
             session['win_streak'] = []
             session['lose_streak'] = []
 
+        eal = session['eal']
 
-        return render_template("fill_the_gaps.html")
+        print("eal mode is", eal)
+
+        return render_template("fill_the_gaps.html", eal=bool(eal), hide_non_topic=bool(session['hide_non_topic']), opt_out=bool(session['opt_out']))
 
     else:
         return redirect(url_for('login'))
@@ -333,6 +338,19 @@ def db_sync():
     else:
         return redirect(url_for("fill_the_gaps"))
 
+@app.route("/save_settings", methods=["POST"])
+def save_settings():
+    if current_user.is_authenticated:
+        eal = request.form.get("eal_mode_toggle")
+        no_non_topic = request.form.get("hide_non_topic_toggle")
+        opt_out = request.form.get("opt_out_toggle")
+        print(eal, no_non_topic, opt_out)
+        save_settings_to_db(eal, no_non_topic, opt_out, current_user.user_id)
+        session['eal'], session['hide_non_topic'], session['opt_out'] = eal, no_non_topic, opt_out
+        return "200"
+    else:
+        return "404"
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
 
@@ -364,9 +382,12 @@ def login():
             if username == this_user.username and password == this_user.password:
                 login_user(this_user)
                 flash('Logged in successfully ' + username + " - now choose your topics!")
+                session['eal'], session['hide_non_topic'], session['opt_out'] = get_settings_from_db(user_id)[0]
                 return redirect(url_for('fill_the_gaps'))
             else:
                 flash('Login Unsuccessful.')
+
+
 
     return render_template("login.html")
 

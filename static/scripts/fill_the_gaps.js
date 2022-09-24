@@ -593,6 +593,28 @@ function submit_answer()
     );
 };
 
+function save_settings()
+{
+
+    let form_data = new FormData();
+    for (let setting of document.querySelectorAll('input[data-toggle="toggle"]'))
+    {
+        form_data.append(setting.getAttribute("name"), setting.checked);
+    }
+
+    fetch('/save_settings',
+    {
+        body:form_data,
+        method:"post"
+    })
+    .then(res => {
+    if (res==404) { window.location.href = "/login";}
+    return res.text()})
+    .then(data => {
+    $('#settings_modal').modal('toggle');
+     display_message("settings saved") } );
+
+}
 
 function begin_session()
 {
