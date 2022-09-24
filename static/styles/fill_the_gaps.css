@@ -1,6 +1,7 @@
 html {
   overflow-y: hidden;
   overflow-x: hidden;
+
 }
 
 body
@@ -9,6 +10,9 @@ body
     margin-left:auto;
     margin-right:auto;
     overflow-x: hidden;
+
+    font-family:"Hind";
+
 }
 
 header, #config
@@ -180,7 +184,9 @@ header
 h2
 {
     font-style:italic;
-    font-size:1em;
+
+    font-size:.8em;
+
     color:#999999;
 }
 
@@ -231,3 +237,9 @@ footer {
     -moz-column-count: 2;
     column-count: 2;
 }
+
+h1
+{
+    font-family:"Major Mono Display";
+}
+

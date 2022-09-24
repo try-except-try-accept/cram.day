@@ -24,6 +24,7 @@ app.secret_key = uuid4().hex
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
 
+
 #############################################################################
 
 def get_stats():
@@ -326,8 +327,11 @@ def home():
 
 @app.route("/db_sync")
 def db_sync():
-    if True: #current_user.is_admin:
+
+    if current_user.is_admin:
         return sync_data_with_db()
+    else:
+        return redirect(url_for("fill_the_gaps"))
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -368,4 +372,5 @@ def login():
 
 
 if __name__ == "__main__":
+
     serve(app, host='0.0.0.0', port=8080)

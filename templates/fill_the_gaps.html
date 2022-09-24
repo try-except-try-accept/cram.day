@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Fill The Gaps</title>
+
+    <title>cram.day</title>
+
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
@@ -14,7 +16,10 @@
 
     <script src="static/scripts/fill_the_gaps.js"></script>
 
-    <link href='https://fonts.googleapis.com/css?family=Nunito|Codystar|Open+Sans' rel='stylesheet' type='text/css'>
+
+    <link href="https://fonts.googleapis.com/css?family=Nunito|Codystar|Open+Sans|Hind" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
       integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
 
@@ -27,8 +32,10 @@
 
 
     <header>
-        <h1>C.R.A.M</h1>
-        <h2>completely remember all mark schemes!</h2>
+
+        <h1>cram.day</h1>
+        <h2>completely.remember.all.mark.schemes.today</h2>
+
     </header>
 
     <div class="container-fluid">
@@ -51,6 +58,8 @@
                       <option value="igcse">Oxford AQA IGCSE</option>
                       <option value="as">CIE AS Level</option>
                         <option value="ks3">KS3 Computing</option>
+                        <option value="pp">Basic Python Principles</option>
+
                     </select>
 
 
@@ -67,9 +76,13 @@
                 <div id="message_display">
                         {% with messages = get_flashed_messages() %}
                         {% if messages %}
+
+                            <ul class="message"?
                             {% for message in messages %}
-                              <p class="message">{{ message }}</p>
+                              <li>{{ message }}</li>
                             {% endfor %}
+                            </ul>
+
 
                           {% endif %}
                         {% endwith %}
@@ -135,7 +148,7 @@
 
     <footer>
         <label for="feedback_speed_slider">Adjust feedback animation speed:</label>
-        <input id="feedback_speed_slider" type="range" min="1" max="10" onchange="adjust_feedback_speed()">
+        <input id="feedback_speed_slider" type="range" min="1" max="20" onchange="adjust_feedback_speed()">
 
         <button id="toggle_leaderboards" onclick="toggle_leaderboard()">hide leaderboards</button>
     </footer>

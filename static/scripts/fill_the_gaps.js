@@ -84,7 +84,11 @@ AS_TOPICS = `1.1 Data representation
 12.2 Program design
 12.3 Program testing and maintenance`.split("\n")
 
-KS3_TOPICS = `Y9.3 Introduction to databases and SQL`.split("\n")
+
+KS3_TOPICS = `Y8.3 Malicious software
+Y9.3 Introduction to databases and SQL`.split("\n")
+
+BASIC_PYTHON_PRINCIPLES = `PP1 Variables, Data Types and Assignment`.split("\n")
 
 const LEADERBOARD_SLOT_SIZE = 40;
 
@@ -92,7 +96,9 @@ const LEADERBOARD_OFFSET = 0;
 
 BOTTOM_OF_SCREEN = window.screen.height - 300;
 
-feedback_speed = 1000;
+feedback_speed = 2000;
+
+MAX_SLIDER = 20
 
 function toggle_leaderboard()
 {
@@ -141,6 +147,9 @@ function get_topic_list()
     else if (course == "a2") { source = A2_TOPICS; offset = 40;}
     else if (course == "as") { source = AS_TOPICS; offset = 55;}
     else if (course == "ks3") { source = KS3_TOPICS; offset = 84;}
+
+    else if (course == "pp") { source = BASIC_PYTHON_PRINCIPLES; offset = 86;}
+
 
     let topic_checkbox_display = document.getElementById("topic_checkbox_display");
     topic_checkbox_display.innerHTML = "";
@@ -617,7 +626,7 @@ function begin_session()
 
 function adjust_feedback_speed()
 {
-    feedback_speed = parseInt(document.getElementById("feedback_speed_slider").value) * 500
+    feedback_speed = (MAX_SLIDER - parseInt(document.getElementById("feedback_speed_slider").value)+1) * 500
 }
 
 function get_hints()

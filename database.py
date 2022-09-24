@@ -205,7 +205,8 @@ def sync_data_with_db():
 def check_sanitised(topics=None, not_null_ids=None, null_ints=None):
     if topics:
         for t in topics:
-            if not t.replace(".", "").replace("Y", "").isdigit():
+            if not t.replace(".", "").replace("PP", "").replace("Y", "").isdigit():
+
                 print("invalid topic", t)
                 return False
 
@@ -365,7 +366,10 @@ FROM
    answers, users
 WHERE
 	answers.user_id = users.user_id
-	AND answers.time_stamp > {datetime.now().timestamp() - ONE_DAY} 
+
+
+	AND answers.time_stamp > {datetime.now().timestamp() - ONE_HOUR} 
+
 GROUP BY
 	users.user_id
 HAVING
