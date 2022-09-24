@@ -1,3 +1,5 @@
+selected_hint = null;
+
 IGCSE_TOPICS = `3.1.1 REPRESENTING ALGORITHMS
 3.1.2 EFFICIENCY OF ALGORITHMS
 3.1.3 SEARCHING ALGORITHMS
@@ -99,6 +101,11 @@ BOTTOM_OF_SCREEN = window.screen.height - 300;
 feedback_speed = 2000;
 
 MAX_SLIDER = 20
+
+SCREEN_X_VS_LEFT = 0
+SCREEN_Y_VS_TOP = -20
+
+dropee = null;
 
 function toggle_leaderboard()
 {
@@ -367,39 +374,60 @@ function animate_feedback(fb_anim, data)
 
 
 
-function process_hints(hints)
+function process_hints(hint_data)
 {
+    let eal = hint_data.eal_mode
     document.getElementById("hint_button").disabled = true;
-    for (let h of hints)
+    let i = 1;
+    for (let h of hint_data.hints)
     {
          let new_hint = document.createElement("div")
          new_hint.innerHTML = h.text;
-         new_hint.classList.add("hint")
+         new_hint.classList.add("hint");
+         new_hint.setAttribute("id", `hint${i}`)
+         i++;
+
          new_hint.style.top = (200+Math.floor(Math.random() * (window.innerHeight-400))).toString() + "px";
          new_hint.style.left = (200+Math.floor(Math.random() * (window.innerWidth-400))).toString() + "px";
          new_hint.style.backgroundColor = h.colour;
          document.getElementsByTagName("body")[0].appendChild(new_hint);
 
-
-
-
          new_hint.opacity = 1;
 
-        $(new_hint).fadeOut(3 * feedback_speed, function() {
-            $(this).remove();
-        });
+        if (!eal)
+        {
+            $(new_hint).fadeOut(3 * feedback_speed, function() {
+                $(this).remove();
+            });
+        }
+        else
+        {
+
+            new_hint.classList.add("eal_hint");
+
+
+            new_hint.setAttribute("draggable", true)
+            new_hint.setAttribute("ondragstart", "drag(event)")
+
+
+
+            document.getElementById("eal_hint_container").appendChild(new_hint);
+        }
+
     }
+
+
 
 
 }
 
 function remove_hints()
 {
-    let body = document.getElementsByTagName("body")[0];
 
-    for (let hint of document.getElementsByClassName("hint"))
+    let elements = document.getElementsByClassName("hint");
+    while(elements.length > 0)
     {
-        body.removeChild(hint);
+        elements[0].parentNode.removeChild(elements[0]);
     }
 }
 
@@ -666,3 +694,26 @@ window.addEventListener("keypress", (event) => {
             submit_answer();
         }
     });
+
+
+
+function allow_drop(ev)
+{
+  ev.preventDefault();
+}
+
+function drag(ev)
+{
+  let text = ev.target.textContent;
+  console.log(text);
+  console.log(ev.target);
+  ev.dataTransfer.setData("text", text);
+}
+
+function drop(ev)
+{
+  ev.preventDefault();
+  let data = ev.dataTransfer.getData("text");
+  console.log("The target was", ev.target);
+  ev.target.value = data;
+}

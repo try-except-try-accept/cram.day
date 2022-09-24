@@ -96,7 +96,13 @@
 
                 <div id="question"></div>
 
+                {% if eal %}
+                <div id="eal_hint_container">
 
+
+                </div>
+
+                {% endif %}
 
 
 
@@ -113,6 +119,10 @@
 
 
     </div>
+
+
+
+
 
     <div id="choose_topics_modal" class="modal fade" role="dialog">
         <div class="choose_topics_modal modal-dialog modal-xl">
@@ -166,7 +176,7 @@
 
                     <form id="settings_chooser">
                         <div class="checkbox">
-                            <label><input type="checkbox" name="eal_mode_toggle" data-toggle="toggle" {% if eal %}checked{% endif %}>EAL mode</label>
+                            <label><input type="checkbox" name="eal_mode_toggle" data-toggle="toggle" {% if eal %}checked{% endif %}>EAL mode</label> <em class="help_note">(hints will pin to the bottom of the app and can be dragged to fill the gaps)</em>
                         </div>
                         <div class="checkbox">
                             <label><input type="checkbox" name="hide_non_topic_toggle" data-toggle="toggle" {% if hide_non_topic %}checked{% endif %}>Hide non-topic misnomers</label> <em class="help_note">(when you <b>show hints</b> you will only see words from your selected topics)</em>

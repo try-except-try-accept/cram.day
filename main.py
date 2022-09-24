@@ -105,8 +105,12 @@ def create_question():
 
                 if rep_word in word:
                     session['correct'].append(rep_word)
-                    add_field = " " + word.replace(rep_word, f'<input autocomplete="off" class="gap_textfield" type="text" name="answer{i}" required'
-                                                             f'>') + " "
+                    add_field = " " + word.replace(rep_word, f'''<input autocomplete="off" class="gap_textfield"
+                                                                type="text" 
+                                                                ondrop="drop(event)" ondragover="allow_drop(event)"
+                                                                id="answer{i}"
+                                                                name="answer{i}" required'
+                                                             f'>''') + " "
                     html_out += add_field
                     replacement_added = True
                     i += 1
@@ -288,14 +292,14 @@ def get_hints():
 
         for h in hints:
             this_hint = {}
-            this_hint['text'] = h + "... ?"
+            this_hint['text'] = h
             this_hint['colour'] = "#" + "".join([hex(randrange(200, 255))[2:].zfill(2) for i in range(3)])
 
             final_hints.append(this_hint)
             print(final_hints)
 
 
-        return jsonify(final_hints)
+        return jsonify({"hints":final_hints, "eal_mode":session['eal']})
 
     else:
         return 404
