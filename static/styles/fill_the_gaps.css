@@ -105,6 +105,8 @@ header
 {
     top:200px;
     position:absolute;
+
+
 }
 
 #choose_topics_modal
@@ -128,6 +130,7 @@ header
 #question
 {
     z-index:-1;
+
 
 }
 
@@ -288,3 +291,12 @@ h1
     to {top:75vh; left: calc(var(--nth-child)*9%)}
 
 }
+
+#stats_display_container
+{
+
+  display: grid;
+  place-content: center;
+
+}
+

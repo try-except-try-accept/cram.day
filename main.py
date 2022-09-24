@@ -16,7 +16,7 @@ from waitress import serve
 from user import User
 
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
-
+from helpers import get_chart
 
 
 app = Flask(__name__)
@@ -260,6 +260,9 @@ def begin_session():
 def fill_the_gaps():
     if current_user.is_authenticated:
 
+
+        chart = get_chart()
+
         if session.get('scores') is None:
             session['scores'] = []
             session['difficulty'] = 1
@@ -270,7 +273,7 @@ def fill_the_gaps():
 
         print("eal mode is", eal)
 
-        return render_template("fill_the_gaps.html", eal=bool(eal), hide_non_topic=bool(session['hide_non_topic']), opt_out=bool(session['opt_out']))
+        return render_template("fill_the_gaps.html", chart=chart, eal=bool(eal), hide_non_topic=bool(session['hide_non_topic']), opt_out=bool(session['opt_out']))
 
     else:
         return redirect(url_for('login'))

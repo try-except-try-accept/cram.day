@@ -28,7 +28,7 @@
 
     <link href="static/styles/fill_the_gaps.css" rel="stylesheet" type="text/css">
 
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
 
 </head>
 <body>
@@ -94,7 +94,20 @@
 
                 </div>
 
-                <div id="question"></div>
+                <div id="question">
+
+
+
+                </div>
+
+                <div id="stats_display_container">
+
+                    <canvas id="stats_display" style="width:100%;max-width:600px"></canvas>
+
+                    {{ chart }}
+
+
+                </div>
 
                 {% if eal %}
                 <div id="eal_hint_container">

@@ -387,8 +387,8 @@ function process_hints(hint_data)
          new_hint.setAttribute("id", `hint${i}`)
          i++;
 
-         new_hint.style.top = (200+Math.floor(Math.random() * (window.innerHeight-400))).toString() + "px";
-         new_hint.style.left = (200+Math.floor(Math.random() * (window.innerWidth-400))).toString() + "px";
+         new_hint.style.top = (0+Math.floor(Math.random() * (window.innerHeight-400))).toString() + "px";
+         new_hint.style.left = (0+Math.floor(Math.random() * (window.innerWidth-400))).toString() + "px";
          new_hint.style.backgroundColor = h.colour;
          document.getElementsByTagName("body")[0].appendChild(new_hint);
 
@@ -667,6 +667,9 @@ function begin_session()
     return res.text()})
     .then(data => {
      $('#choose_topics_modal').modal('toggle');
+
+     let stats = document.getElementById("stats_display_container")
+     document.getElementById("quiz").removeChild(stats)
 
     document.getElementById("question").innerHTML = data;
 

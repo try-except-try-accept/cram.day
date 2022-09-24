@@ -11,7 +11,7 @@ from flask import flash, Markup
 # user answers question -> db updates answers table, db returns leaderboard data
 # daemon/periodic update -> server updates questions table based on gspread
 from datetime import datetime
-from random import sample, shuffle
+from random import sample, shuffle, randint, choice
 
 
 def load_user_creds(user_id=None, username=None):
@@ -260,6 +260,42 @@ WHERE questions.topic_index IN ({topics})
     query_db(q)
     #print(q2)
     query_db(q2)
+
+def get_chart_data():
+
+    if not randint(0, 2):
+        correct = randint(0, 1)
+        q = f'''
+SELECT answer, COUNT(answer) as county
+FROM answers 
+WHERE correct = {correct}
+AND LENGTH(answer) > 2
+GROUP BY answer
+ORDER BY county
+DESC LIMIT 10'''
+        title = f"Most Popular {'Correct' if correct else 'Incorrect'} Answers"
+        data = query_db(q)
+    elif randint(0, 1):
+        data = read_leaderboard_from_db()[0]
+        title = f"Top 25 Most Engaged Students (Total Number of Correct Answers)"
+    else:
+        letter = chr(randint(65, 65+26))
+        if letter in "XQ":
+            letter = choice("APT")
+
+        q = f'''SELECT users.username,
+SUM(CASE WHEN answers.correct = 1 THEN 1 ELSE 0 END),
+COUNT(answers.answer)
+FROM answers, users
+WHERE answers.user_id = users.user_id
+AND answers.answer != ""
+AND SUBSTRING(users.nickname, 1, 1)="{letter}"
+GROUP BY username'''
+        data = query_db(q)
+        title = f"% Success Rate - Students Whose Name Begin With The Letter '{letter}'"
+
+
+    return {"title":title, "data":data}
 
 def get_misnomers(correct, user_id):
     q = f'''SELECT DISTINCT questions.gaps
