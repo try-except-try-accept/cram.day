@@ -248,3 +248,8 @@ h1
     font-family:"Major Mono Display";
 }
 
+.help_note
+{
+    color:#AAAAAA;
+    font-size:.8em;
+}

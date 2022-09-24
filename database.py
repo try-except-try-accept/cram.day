@@ -261,8 +261,16 @@ WHERE questions.topic_index IN ({topics})
     #print(q2)
     query_db(q2)
 
-def get_misnomers(correct):
-    q = '''SELECT gaps FROM questions'''
+def get_misnomers(correct, user_id):
+    q = f'''SELECT DISTINCT questions.gaps
+FROM questions, users, sessions
+WHERE users.user_id = 1181
+AND (users.hide_non_topic = 0
+OR 
+(sessions.in_use_flag = 1
+AND sessions.user_id = {user_id}
+AND questions.question_id = sessions.question_id))
+'''
 
     results = query_db(q)
 

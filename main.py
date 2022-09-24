@@ -280,7 +280,7 @@ def get_hints():
 
         hints = session['correct']
 
-        hints = get_misnomers(hints)
+        hints = get_misnomers(hints, current_user.user_id)
 
         shuffle(hints)
 
