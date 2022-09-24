@@ -45,31 +45,34 @@ def get_chart():
 		elif "Top 25" in title:
 			answers.append(row[1])
 			counts.append(row[3])
+	try:
+		answers = '"' + '","'.join(str(a) for a in answers) + '"'
+		counts = ",".join(str(i) for i in counts)
 
-	answers = '"' + '","'.join(answers) + '"'
-	counts = ",".join(str(i) for i in counts)
+		colours = '"' + '","'.join(get_hex_shades(len(counts))) + '"'
 
-	colours = '"' + '","'.join(get_hex_shades(len(counts))) + '"'
+		chart = f'''<script>
+			new	Chart("stats_display", {{
+			type: "bar",
+			data: {{
+				labels: [{answers}],
+				datasets: [{{
+					backgroundColor: [{colours}],
+					data: [{counts}]
+				}}]
+			}},
+			  options: {{
+				legend: {{display: false}},
+				title: {{
+				  display: true,
+				  text: "{title}"
+				}}
+			  }}
+		}});
+		
+		</script>'''
 
-	chart = f'''<script>
-		new	Chart("stats_display", {{
-		type: "bar",
-		data: {{
-			labels: [{answers}],
-			datasets: [{{
-				backgroundColor: [{colours}],
-				data: [{counts}]
-			}}]
-		}},
-		  options: {{
-			legend: {{display: false}},
-			title: {{
-			  display: true,
-			  text: "{title}"
-			}}
-		  }}
-	}});
-	
-	</script>'''
-
-	return Markup(chart)
+		return Markup(chart)
+	except Exception as e:
+		print(e)
+		return "<problem rendering stats>"

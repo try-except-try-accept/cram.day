@@ -275,7 +275,7 @@ ORDER BY county
 DESC LIMIT 10'''
         title = f"Most Popular {'Correct' if correct else 'Incorrect'} Answers"
         data = query_db(q)
-    elif randint(0, 1):
+    elif randint(0, 2):
         data = read_leaderboard_from_db()[0]
         title = f"Top 25 Most Engaged Students (Total Number of Correct Answers)"
     else:
@@ -283,7 +283,7 @@ DESC LIMIT 10'''
         if letter in "XQ":
             letter = choice("APT")
 
-        q = f'''SELECT users.username,
+        q = f'''SELECT users.user_id,
 SUM(CASE WHEN answers.correct = 1 THEN 1 ELSE 0 END),
 COUNT(answers.answer)
 FROM answers, users
@@ -297,7 +297,7 @@ GROUP BY username'''
 
     return {"title":title, "data":data}
 
-def get_misnomers(correct, user_id):
+def get_misnomers(correct, user_id, num_hints):
     q = f'''SELECT DISTINCT questions.gaps
 FROM questions, users, sessions
 WHERE users.user_id = 1181
@@ -320,10 +320,10 @@ AND questions.question_id = sessions.question_id))
 
     #print(keywords)
 
-    misnomers = sample(keywords, 10)
+    misnomers = sample(keywords, num_hints)
     for c in correct:
-        while c in results:
-            misnomers = sample(keywords, 10)
+        while c in misnomers:
+            misnomers = sample(keywords, num_hints)
 
 
     misnomers += correct

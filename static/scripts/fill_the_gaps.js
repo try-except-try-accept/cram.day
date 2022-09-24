@@ -90,7 +90,15 @@ AS_TOPICS = `1.1 Data representation
 KS3_TOPICS = `Y8.3 Malicious software
 Y9.3 Introduction to databases and SQL`.split("\n")
 
-BASIC_PYTHON_PRINCIPLES = `PP1 Variables, Data Types and Assignment`.split("\n")
+BASIC_PYTHON_PRINCIPLES = `PP1 Variables, Data Types and Assignment
+PP2 Selection Statements and Debugging`.split("\n")
+
+EVERYTHING = []
+EVERYTHING.concat(A2_TOPICS)
+EVERYTHING.concat(AS_TOPICS)
+EVERYTHING.concat(IGCSE_TOPICS)
+EVERYTHING.concat(KS3_TOPICS)
+EVERYTHING.concat(BASIC_PYTHON_PRINCIPLES)
 
 const LEADERBOARD_SLOT_SIZE = 40;
 
@@ -156,6 +164,9 @@ function get_topic_list()
     else if (course == "ks3") { source = KS3_TOPICS; offset = 84;}
 
     else if (course == "pp") { source = BASIC_PYTHON_PRINCIPLES; offset = 86;}
+
+    else
+    { source = EVERYTHING;}
 
 
     let topic_checkbox_display = document.getElementById("topic_checkbox_display");
@@ -669,7 +680,7 @@ function begin_session()
      $('#choose_topics_modal').modal('toggle');
 
      let stats = document.getElementById("stats_display_container")
-     document.getElementById("quiz").removeChild(stats)
+     try { document.getElementById("quiz").removeChild(stats) } catch (e) { }
 
     document.getElementById("question").innerHTML = data;
 

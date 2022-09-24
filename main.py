@@ -273,7 +273,7 @@ def fill_the_gaps():
 
         print("eal mode is", eal)
 
-        return render_template("fill_the_gaps.html", chart=chart, eal=bool(eal), hide_non_topic=bool(session['hide_non_topic']), opt_out=bool(session['opt_out']))
+        return render_template("fill_the_gaps.html", chart=chart, eal=eal, hide_non_topic=session['hide_non_topic'], opt_out=session['opt_out'])
 
     else:
         return redirect(url_for('login'))
@@ -284,10 +284,14 @@ def fill_the_gaps():
 def get_hints():
     if current_user.is_authenticated:
 
+        eal_mode = session['eal']
+
+        num_hints = 5 if eal_mode else 10
+
 
         hints = session['correct']
 
-        hints = get_misnomers(hints, current_user.user_id)
+        hints = get_misnomers(hints, current_user.user_id, num_hints)
 
         shuffle(hints)
 
@@ -302,7 +306,7 @@ def get_hints():
             print(final_hints)
 
 
-        return jsonify({"hints":final_hints, "eal_mode":session['eal']})
+        return jsonify({"hints":final_hints, "eal_mode":eal_mode})
 
     else:
         return 404
@@ -351,9 +355,10 @@ def save_settings():
         eal = request.form.get("eal_mode_toggle")
         no_non_topic = request.form.get("hide_non_topic_toggle")
         opt_out = request.form.get("opt_out_toggle")
+        print("Save settings")
         print(eal, no_non_topic, opt_out)
         save_settings_to_db(eal, no_non_topic, opt_out, current_user.user_id)
-        session['eal'], session['hide_non_topic'], session['opt_out'] = eal, no_non_topic, opt_out
+        session['eal'], session['hide_non_topic'], session['opt_out'] = [True if i == "true" else False for i in [eal, no_non_topic, opt_out]]
         return "200"
     else:
         return "404"

@@ -26,6 +26,7 @@ header, #config
     opacity:1;
     border-radius:15px;
     padding: 1em 1em 1em 1em;
+    text-align:center;
 
 }
 
@@ -118,6 +119,8 @@ header
 #settings_modal_content
 {
     margin-left:2em;
+    display: grid;
+  place-content: center;
 }
 
 header
@@ -270,7 +273,7 @@ h1
 .eal_hint
 {
     animation: 1s snap_to_eal_container 1s forwards;
-    width: 7em;
+    min-width: 7em;
 }
 
 :nth-child(1) { --nth-child: 0 }
@@ -288,7 +291,7 @@ h1
 
 @keyframes snap_to_eal_container{
     /* from{width:0;} */
-    to {top:75vh; left: calc(var(--nth-child)*9%)}
+    to {top:75vh; left: calc(var(--nth-child)*17%)}
 
 }
 
@@ -300,3 +303,9 @@ h1
 
 }
 
+.demo
+{
+    border-radius:50px;
+    box-shadow: 2px 2px #444444;
+    max-width:100%;
+}

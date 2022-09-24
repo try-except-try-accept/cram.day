@@ -58,10 +58,12 @@
                     <label for="course">Select course:</label>
                     <select name="course" id="course">
                         <option value="a2">CIE A2 Level</option>
-                      <option value="igcse">Oxford AQA IGCSE</option>
                       <option value="as">CIE AS Level</option>
-                        <option value="ks3">KS3 Computing</option>
+                        <option value="igcse">Oxford AQA IGCSE</option>
                         <option value="pp">Basic Python Principles</option>
+                        <option value="ks3">KS3 Computing</option>
+                        <option value="everything">EVERYTHING</option>
+
 
                     </select>
 
@@ -109,13 +111,13 @@
 
                 </div>
 
-                {% if eal %}
+
                 <div id="eal_hint_container">
 
 
                 </div>
 
-                {% endif %}
+
 
 
 
@@ -185,7 +187,9 @@
 
                 <div id="settings_modal_content" class="modal-body">
 
+                    <img class="demo" src="static/images/eal_mode_demo.gif"/>
 
+                    <br><br>
 
                     <form id="settings_chooser">
                         <div class="checkbox">
@@ -200,6 +204,8 @@
 
 
                     </form>
+
+
 
                 </div>
 
