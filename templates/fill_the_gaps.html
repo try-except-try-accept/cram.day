@@ -5,6 +5,23 @@
 
     <title>cram.day</title>
 
+    <script>
+
+        IGCSE_TOPICS = [{{ topic_data['3'] }}]
+        A2_TOPICS = [{{ topic_data['2'] }}]
+        AS_TOPICS = [{{ topic_data['1'] }}]
+        KS3_TOPICS = [{{ topic_data['4'] }}]
+        BASIC_PYTHON_PRINCIPLES = [{{ topic_data['5'] }}]
+
+        EVERYTHING = []
+        EVERYTHING.concat(A2_TOPICS)
+        EVERYTHING.concat(AS_TOPICS)
+        EVERYTHING.concat(IGCSE_TOPICS)
+        EVERYTHING.concat(KS3_TOPICS)
+        EVERYTHING.concat(BASIC_PYTHON_PRINCIPLES)
+
+    </script>
+
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>

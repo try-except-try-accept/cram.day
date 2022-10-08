@@ -193,11 +193,34 @@ def sync_data_with_db():
 
     ss.update(f'A1', all_answers)
 
+    fill_gaps = sh.worksheet('topics')
+    data = fill_gaps.get("A2:C1000")
+    q = "INSERT OR IGNORE INTO topics (topic_id, topic_index, topic_name, topic_category) VALUES "
+    for row in data:
+        index = row[1].split(" ")[0]
+        name = " ".join(row[1].split(" ")[1:])
+        q += f'({row[0]}, "{index}", "{name}", "{row[2]}"),'
+
+
+
+    query_db(q[:-1])
+
 
 
     return Markup(question_data_conf + answer_data_conf)
 
 
+def get_topic_data():
+
+    q = '''SELECT topic_index, topic_name, topic_category FROM topics'''
+    results = query_db(q)
+    print(results)
+    topic_data = {}
+    for index, topic in zip([1,2,3,4,5], ["a2", "as", "igcse", "ks3", "pp"]):
+        topic_data[index] = Markup(",".join([f'"{row[0]} {row[1]}"' for row in results if row[2] == index]))
+
+    print(topic_data)
+    return topic_data
 
 
 

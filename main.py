@@ -9,7 +9,7 @@ from uuid import uuid4
 
 from database import write_session_to_db, get_question_data,save_answers_to_db, read_leaderboard_from_db, \
                      get_misnomers, authenticate_user, load_user_creds, sync_data_with_db, save_settings_to_db, \
-                     get_settings_from_db
+                     get_settings_from_db, get_topic_data
 
 
 from waitress import serve
@@ -272,8 +272,8 @@ def fill_the_gaps():
         eal = session['eal']
 
         print("eal mode is", eal)
-
-        return render_template("fill_the_gaps.html", chart=chart, eal=eal, hide_non_topic=session['hide_non_topic'], opt_out=session['opt_out'])
+        print("Topic data is", session['topic_data'])
+        return render_template("fill_the_gaps.html", chart=chart, eal=eal, hide_non_topic=session['hide_non_topic'], opt_out=session['opt_out'], topic_data=session['topic_data'])
 
     else:
         return redirect(url_for('login'))
@@ -395,6 +395,7 @@ def login():
                 login_user(this_user)
                 flash('Logged in successfully ' + username + " - now choose your topics!")
                 session['eal'], session['hide_non_topic'], session['opt_out'] = get_settings_from_db(user_id)[0]
+                session['topic_data'] = get_topic_data()
                 return redirect(url_for('fill_the_gaps'))
             else:
                 flash('Login Unsuccessful.')
