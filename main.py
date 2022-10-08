@@ -157,45 +157,56 @@ def submit_answer():
 
     if current_user.is_authenticated:
         answers = request.form.get("answers").split(",")
-        answers_copy = list(answers)
-        question = session['question']
-        replacements = session['correct']
         score = []
         feedback = []
         html_out = ""
 
-        print("Received answers", answers)
-        print("Corrected answers", replacements)
+        if not all(a.strip() == "" for a in answers):
 
-        for correct_answer in replacements:
-
-            if len(answers) and correct_answer.lower() == answers.pop(0).lower():
-                feedback.append(None)
-                result = 1
+            answers_copy = list(answers)
+            question = session['question']
+            replacements = session['correct']
 
 
-            else:
-                feedback.append(correct_answer)
-                result = 0
+            print("Received answers", answers)
+            print("Corrected answers", replacements)
 
-            score.append(result)
-            session['win_streak'].append(result)
-            if len(session['win_streak']) == 11:
-                session['win_streak'].pop(0)
-            session['lose_streak'].append(result)
+            for correct_answer in replacements:
+
+                if len(answers) and correct_answer.lower() == answers.pop(0).lower():
+                    feedback.append(None)
+                    result = 1
+
+
+                else:
+                    feedback.append(correct_answer)
+                    result = 0
+
+                score.append(result)
+                session['win_streak'].append(result)
+                if len(session['win_streak']) == 11:
+                    session['win_streak'].pop(0)
+
+
+                session['lose_streak'].append(result)
+                if len(session['lose_streak']) == 6:
+                    session['lose_streak'].pop(0)
+
+            print("The score was", score)
+
+            save_answers_to_db(current_user.user_id, answers_copy, score)
+            session['scores'].append(round(sum(score)/len(score)))
+
+
+
+            message = ""
+
+        else:
+            message = ""
+            score = 0
+            session['lose_streak'].append(0)
             if len(session['lose_streak']) == 6:
                 session['lose_streak'].pop(0)
-
-        print("The score was", score)
-
-        save_answers_to_db(current_user.user_id, answers_copy, score)
-        session['scores'].append(round(sum(score)/len(score)))
-
-
-
-        message = ""
-
-
 
         win_streak = session['win_streak']
         lose_streak = session['lose_streak']
@@ -216,6 +227,7 @@ def submit_answer():
 
 
         overall = str(round(sum(session['scores']) / len(session['scores']), 2) * 100) + "%"
+
         response = {'feedback':feedback,
                     'scores':score,
                     'total':overall,
@@ -407,4 +419,6 @@ def login():
 
 if __name__ == "__main__":
 
-    serve(app, host='0.0.0.0', port=8080)
+    serve(app, host='0.0.0.0', port=80)
+
+

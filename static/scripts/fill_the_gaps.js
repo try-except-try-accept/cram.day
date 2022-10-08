@@ -488,16 +488,27 @@ function process_feedback(feedback, scores)
 
 function submit_answer()
 {
+    answers = question.querySelectorAll(".gap_textfield");
+    answers_given = [];
+    let some_answer = false;
+    let this_answer = "";
+    for (let a of answers)
+    {
+        this_answer = a.value;
+        answers_given.push(this_answer);
+        if (this_answer) { some_answer = true }
+    }
+
+    if (!some_answer)
+    {
+        display_message("Please give an answer...");
+        return false;
+    }
 
     kill_non_text_elems();
     let form_data = new FormData();
     question_div = document.getElementById("question")
-    answers = question.querySelectorAll(".gap_textfield");
-    answers_given = [];
-    for (let a of answers)
-    {
-        answers_given.push(a.value);
-    }
+
     form_data.append("answers", answers_given);
 
     fetch('/submit_answer',
