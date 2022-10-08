@@ -248,7 +248,7 @@ def check_sanitised(topics=None, not_null_ids=None, null_ints=None):
     return True
 
 
-def write_session_to_db(topics, q_repeat, user_id):
+def write_session_to_db(topics, q_repeat, everything, user_id):
     """Update session table with user's chosen topics
     count will be null if infinite repeats allowed"""
 
@@ -263,12 +263,12 @@ def write_session_to_db(topics, q_repeat, user_id):
 
     topics = ",".join([f'"{t}"' for t in topics])
     q = f'''UPDATE sessions
-SET in_use_flag = CASE WHEN questions.topic_index IN ({topics}) THEN 1 ELSE 0 END, gen_count = {q_repeat}
+SET in_use_flag = CASE WHEN questions.topic_index IN ({topics}) OR {everything} THEN 1 ELSE 0 END, gen_count = {q_repeat}
 FROM questions
 WHERE sessions.user_id = {user_id} AND questions.question_id = sessions.question_id;'''
 
     q = f'''UPDATE sessions
-SET in_use_flag = CASE WHEN question_id IN (SELECT question_id FROM questions WHERE topic_index in ({topics}))
+SET in_use_flag = CASE WHEN question_id IN (SELECT question_id FROM questions WHERE {everything} OR topic_index in ({topics}))
 THEN 1 ELSE 0 END, gen_count = {q_repeat}
 WHERE sessions.user_id = {user_id}'''
 

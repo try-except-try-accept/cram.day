@@ -20,6 +20,26 @@
         EVERYTHING.concat(KS3_TOPICS)
         EVERYTHING.concat(BASIC_PYTHON_PRINCIPLES)
 
+        function check_everything()
+        {
+            console.log("Checking");
+            choose_btn = document.getElementById("choose_button");
+            begin_btn = document.getElementById("begin_button");
+            select = document.getElementById("course");
+            if (select.value == "everything")
+            {
+                choose_btn.style.opacity = 0;
+                begin_btn.style.opacity = 1;
+            }
+            else
+            {
+                choose_btn.style.opacity = 1;
+                begin_btn.style.opacity = 0;
+
+            }
+        }
+
+
     </script>
 
 
@@ -73,7 +93,7 @@
                 <div id="config">
 
                     <label for="course">Select course:</label>
-                    <select name="course" id="course">
+                    <select onchange="check_everything()" name="course" id="course">
                         <option value="a2">CIE A2 Level</option>
                       <option value="as">CIE AS Level</option>
                         <option value="igcse">Oxford AQA IGCSE</option>
@@ -89,6 +109,7 @@
                                         data-toggle="modal" data-target="#choose_topics_modal">
                         Choose topics
                     </button>
+                    <button onclick="begin_session();" style="opacity:0" class="btn btn-dark" id="begin_button">Begin</button>
 
                     <button id="hint_button" onclick="get_hints();" class="btn btn-dark" type="button">Show hints</button>
                     <button id="check_button" onclick="submit_answer();" class="btn btn-dark" type="button">Check</button>
@@ -251,3 +272,4 @@
 
 
 </script>
+

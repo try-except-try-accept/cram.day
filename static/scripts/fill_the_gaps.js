@@ -571,14 +571,32 @@ function save_settings()
 function begin_session()
 {
     let form_data = new FormData();
-    topics = document.getElementsByClassName("topic_checkbox");
     selected_topics = [];
-    for (let t of topics)
+    let q_repeat = null;
+
+    if (document.getElementById("course").value == "everything")
     {
-        if (t.checked) { selected_topics.push(t.getAttribute("name"))}
+        form_data.append("everything", true)
+    }
+    else
+    {
+        form_data.append("everything", true)
+
+
+        topics = document.getElementsByClassName("topic_checkbox");
+
+        for (let t of topics)
+        {
+            if (t.checked) { selected_topics.push(t.getAttribute("name"))}
+        }
+        q_repeat = document.getElementById("q_repeat").value
+
+        $('#choose_topics_modal').modal('toggle');
     }
     form_data.append("selected_topics", selected_topics);
-    form_data.append("q_repeat", document.getElementById("q_repeat").value);
+
+
+    form_data.append("q_repeat", q_repeat);
     console.log(form_data);
 
     fetch('/begin_session',
@@ -590,7 +608,7 @@ function begin_session()
     if (res==404) { window.location.href = "/login";}
     return res.text()})
     .then(data => {
-     $('#choose_topics_modal').modal('toggle');
+
 
      let stats = document.getElementById("stats_display_container")
      try { document.getElementById("quiz").removeChild(stats) } catch (e) { }
