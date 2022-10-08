@@ -250,12 +250,13 @@ def begin_session():
         if request.method == "POST":
             topics = request.form.get("selected_topics").split(",")
             q_repeat = request.form.get("q_repeat")
-            everything = request.form.get("everything")
+            everything = bool(request.form.get("everything").replace("false", ""))
             if q_repeat == "infinity":
                 q_repeat = None
 
             print("topics is", topics)
             print("q rpeat is", q_repeat)
+            print("everything is", everything)
 
             write_session_to_db(topics, q_repeat, everything, current_user.user_id)
 

@@ -580,7 +580,7 @@ function begin_session()
     }
     else
     {
-        form_data.append("everything", true)
+        form_data.append("everything", false)
 
 
         topics = document.getElementsByClassName("topic_checkbox");

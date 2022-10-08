@@ -254,7 +254,7 @@ def write_session_to_db(topics, q_repeat, everything, user_id):
 
 
 
-    if not check_sanitised(topics=topics, not_null_ids=[user_id], null_ints=[q_repeat]):
+    if not everything and not check_sanitised(topics=topics, not_null_ids=[user_id], null_ints=[q_repeat]):
         flash("Problem writing to database.", "error")
         return
 
