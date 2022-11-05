@@ -24,7 +24,7 @@
 
 <img src="repo_assets/cram-01.gif" width="800">
 
-### //TODO
+### // TODO
 
  * prevent 'level up' gap increase making questions impossible to answer (e.g. removing all context)
  * half points for hints?
