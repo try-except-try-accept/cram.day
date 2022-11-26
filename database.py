@@ -4,6 +4,7 @@ from config import DB_MODE
 import sqlite3
 from config import *
 from flask import flash, Markup
+from os import environ
 # db plan
 ###############################
 # user chooses topics -> db updates session table flags
@@ -120,7 +121,22 @@ def sync_data_with_db():
     # sync spreadsheet question data with database
     query_db("DELETE FROM questions")
 
-    gc = gspread.service_account(filename="secret/cram-revision-app-5da8bea462ae.json")
+
+
+    try:
+        gc = gspread.service_account(filename="secret/cram-revision-app-5da8bea462ae.json")
+    except:
+        print("Loading from system env var")
+
+        try:
+            gc = gspread.service_account()
+        except:
+            with open("~/.config/gspread/service_account.json", "w") as f:
+                f.write(environ("CRAM_DAY_GSUITE"))
+
+            gc = gspread.service_account()
+
+
     sh = gc.open('CRAM Data Source')
 
     fill_gaps = sh.worksheet('fill_gaps')
