@@ -15,11 +15,11 @@ from random import sample, shuffle, randint, choice
 
 def load_user_creds(user_id=None, username=None):
     if username:
-        result = query_db(f'SELECT user_id, username, nickname, code from users where username = "{username}"')
+        result = query_db(f'SELECT user_id, username, code from users where username = "{username}"')
     else:
-        result = query_db(f'SELECT user_id, username, nickname, code from users where user_id = "{user_id}"')
+        result = query_db(f'SELECT user_id, username, code from users where user_id = "{user_id}"')
 
-    #print(result)
+    print(result)
 
     if result is None or len(result) == 0:
         return None
@@ -35,7 +35,7 @@ def authenticate_user(username, password):
         return False
 
 
-    q = f'SELECT user_id, nickname FROM users WHERE username="{username}" AND code="{password}" LIMIT 1'
+    q = f'SELECT user_id, username FROM users WHERE username="{username}" AND code="{password}" LIMIT 1'
 
     result = query_db(q)
 
@@ -67,6 +67,7 @@ def query_db(query, catch=True, args=None):
 
     try:
         if args is None:
+            print(query)
             res = cursor.execute(query)
         else:
             res = cursor.execute(query, (*args,))
@@ -308,7 +309,7 @@ ORDER BY county
 DESC LIMIT 10'''
         title = f"Most Popular {'Correct' if correct else 'Incorrect'} Answers"
         data = query_db(q)
-    elif randint(0, 2):
+    elif randint(0, 1):
         data = read_leaderboard_from_db()[0]
         title = f"Top 25 Most Engaged Students (Total Number of Correct Answers)"
     else:
@@ -417,8 +418,7 @@ def read_leaderboard_from_db():
     q = '''
     SELECT
        answers.user_id as user,   
-       users.username,
-       users.nickname,
+       users.username,       
        SUM(answers.correct) as overall
     FROM
        answers, users
@@ -438,8 +438,7 @@ def read_leaderboard_from_db():
     q2 = f'''
 SELECT
    answers.user_id as user,
-   users.username,   
-   users.nickname,
+   users.username, 
    SUM(answers.correct) as overall
 FROM
    answers, users

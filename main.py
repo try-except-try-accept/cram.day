@@ -381,8 +381,8 @@ def load_user(user_id):
     if creds is None:
         return None
     else:
-        user_id, username, nick, password = creds
-        return User(user_id, username, nick, password)
+        user_id, username, password = creds
+        return User(user_id, username, password)
 
 @app.route("/logout")
 def logout():
@@ -455,7 +455,7 @@ def login():
         if creds is None:
             flash('Login Unsuccessful.')
         else:
-            user_id, username, nickname, code = creds
+            user_id, username, code = creds
 
             this_user = load_user(user_id)
 
