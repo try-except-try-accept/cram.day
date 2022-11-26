@@ -309,7 +309,7 @@ ORDER BY county
 DESC LIMIT 10'''
         title = f"Most Popular {'Correct' if correct else 'Incorrect'} Answers"
         data = query_db(q)
-    elif randint(0, 1):
+    elif randint(0, 2):
         data = read_leaderboard_from_db()[0]
         title = f"Top 25 Most Engaged Students (Total Number of Correct Answers)"
     else:
@@ -418,7 +418,8 @@ def read_leaderboard_from_db():
     q = '''
     SELECT
        answers.user_id as user,   
-       users.username,       
+       users.username,
+       users.username,
        SUM(answers.correct) as overall
     FROM
        answers, users
@@ -438,7 +439,8 @@ def read_leaderboard_from_db():
     q2 = f'''
 SELECT
    answers.user_id as user,
-   users.username, 
+   users.username,   
+   users.username,
    SUM(answers.correct) as overall
 FROM
    answers, users
