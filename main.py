@@ -1,18 +1,12 @@
 from flask import Flask, session, url_for, render_template, request, Markup, jsonify, redirect, flash
-
-import json
-import gspread
-
-
 from random import choice, randrange, shuffle, sample, randint
 from uuid import uuid4
-
 from database import write_session_to_db, get_question_data,save_answers_to_db, read_leaderboard_from_db, \
                      get_misnomers, authenticate_user, load_user_creds, sync_data_with_db, save_settings_to_db, \
                      get_settings_from_db, get_topic_data
 
 
-from waitress import serve
+
 from user import User
 
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
@@ -485,8 +479,7 @@ def create_app():
 
 if __name__ == "__main__":
 
-    serve(app, host='0.0.0.0', port=80)
-    #app.run(host="0.0.0.0", port=81)
+    app.run(host="0.0.0.0", port=81)
 
 
 

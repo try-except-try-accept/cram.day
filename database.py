@@ -1,6 +1,4 @@
 import gspread
-from config import DB_MODE
-
 import sqlite3
 from config import *
 from flask import flash, Markup
