@@ -65,11 +65,9 @@ def record_answers():
     #############################################################################
 
 
-def perform_replacements(question_tokens, replacements, colour_map, ):
+def perform_replacements(question_tokens, replacements, colour_map):
     html_out = ""
     i, skip = 0, 0
-
-    session = {"correct":[]}
 
     for y, word in enumerate(question_tokens):
         if skip:
@@ -213,7 +211,8 @@ def submit_answer():
             #print("The score was", score)
 
             save_answers_to_db(current_user.user_id, answers_copy, score)
-            session['scores'].append(round(sum(score)/len(score)))
+            if score:
+                session['scores'].append(round(sum(score)/len(score)))
 
 
 
