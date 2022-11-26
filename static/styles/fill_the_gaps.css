@@ -85,8 +85,12 @@ header
 {
     height:100px;
     text-align:center;
+    width:100%;
     font-style:italic;
     left:0;
+    display: flex;
+    justify-content: center;
+    padding-top:1em;
 }
 
 #quiz

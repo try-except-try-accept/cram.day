@@ -226,7 +226,7 @@ def get_topic_data():
 
 
 def check_sanitised(topics=None, not_null_ids=None, null_ints=None):
-
+    print(topics, not_null_ids, null_ints)
     if not_null_ids:
         for id_ in not_null_ids:
             if not str(id_).isdigit():
@@ -265,6 +265,8 @@ WHERE sessions.user_id = {user_id} AND questions.question_id = sessions.question
 SET in_use_flag = CASE WHEN question_id IN (SELECT question_id FROM questions WHERE {everything} OR topic_index in ({topics}))
 THEN 1 ELSE 0 END, gen_count = {q_repeat}
 WHERE sessions.user_id = {user_id}'''
+
+    print(q)
 
     q2 = f'''
 INSERT OR IGNORE INTO sessions (user_id, question_id, in_use_flag, gen_count)

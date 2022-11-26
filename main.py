@@ -65,13 +65,16 @@ def record_answers():
     #############################################################################
 
 
-def perform_replacements(question_tokens, replacements, colour_map):
+def perform_replacements(question_tokens, replacements, colour_map, test_mode=False):
     html_out = ""
     i, skip = 0, 0
+
+
 
     for y, word in enumerate(question_tokens):
         if skip:
             skip -= 1
+            print("skipped", word)
             continue
 
         replacement_added = False
@@ -88,18 +91,26 @@ def perform_replacements(question_tokens, replacements, colour_map):
             elif " " in rep_word:
                 parts = rep_word.split(" ")
                 multi_part_gap_found = True
-
+                new_word = ""
                 for x in range(len(parts)):
                     next_token_index = y + x
 
                     if next_token_index >= len(question_tokens) or parts[x] != question_tokens[next_token_index]:
+                        print("Did not find multi part gap")
                         multi_part_gap_found = False
                         break
+                    else:
+                        new_word += " " + question_tokens[next_token_index]
                 if multi_part_gap_found:
-                    session['correct'].append(rep_word)
+                    print("Found multi part gap")
                     skip = x
 
-                    add_field = " " + word.replace(rep_word, GAP_HTML.format(colour=colour_map[rep_word], i=i)) + " "
+                    add_field = new_word
+
+                    for part in parts:
+                        print(f"i'll replace {part} with a gap")
+                        session['correct'].append(part)
+                        add_field = " " + add_field.replace(part, GAP_HTML.format(colour=colour_map[part], i=i)) + " "
 
                     html_out += add_field
                     replacement_added = True
@@ -142,7 +153,7 @@ def create_question():
         colours = list(PASTEL_COLOURS)
         shuffle(colours)
 
-        colour_map = {rep:colours.pop(0) for rep in " ".join(replacements).split()}
+        colour_map = {rep:colours.pop(0) for rep in " ".join(replacements).split()} # join up and resplit to handle rep words with spaces
 
 
 
@@ -189,7 +200,7 @@ def submit_answer():
 
             for correct_answer in replacements:
 
-                if len(answers) and correct_answer.lower() == answers.pop(0).lower():
+                if len(answers) and correct_answer.lower() == answers.pop(0).lower().strip():
                     feedback.append(None)
                     result = 1
 
@@ -269,7 +280,7 @@ def begin_session():
             q_repeat = request.form.get("q_repeat")
             everything = bool(request.form.get("everything").replace("false", ""))
             print("was everything chosen", everything)
-            if q_repeat == "infinity":
+            if q_repeat in ["infinity", "null"]: # either default mode or everything mode
                 q_repeat = None
 
             #print("topics is", topics)
