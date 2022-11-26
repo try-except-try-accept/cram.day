@@ -168,8 +168,8 @@ def submit_answer():
             replacements = session['correct']
 
 
-            print("Received answers", answers)
-            print("Corrected answers", replacements)
+            #print("Received answers", answers)
+            #print("Corrected answers", replacements)
 
             for correct_answer in replacements:
 
@@ -192,7 +192,7 @@ def submit_answer():
                 if len(session['lose_streak']) == 6:
                     session['lose_streak'].pop(0)
 
-            print("The score was", score)
+            #print("The score was", score)
 
             save_answers_to_db(current_user.user_id, answers_copy, score)
             session['scores'].append(round(sum(score)/len(score)))
@@ -211,8 +211,8 @@ def submit_answer():
         win_streak = session['win_streak']
         lose_streak = session['lose_streak']
 
-        print("win streak is", win_streak)
-        print("lose streak is", lose_streak)
+        #print("win streak is", win_streak)
+        #print("lose streak is", lose_streak)
 
         if len(lose_streak) == 5 and sum(lose_streak) == 0:
             message = "5 incorrect in a row! :("
@@ -254,9 +254,9 @@ def begin_session():
             if q_repeat == "infinity":
                 q_repeat = None
 
-            print("topics is", topics)
-            print("q rpeat is", q_repeat)
-            print("everything is", everything)
+            #print("topics is", topics)
+            #print("q rpeat is", q_repeat)
+            #print("everything is", everything)
 
             write_session_to_db(topics, q_repeat, everything, current_user.user_id)
 
@@ -285,8 +285,8 @@ def fill_the_gaps():
 
         eal = session['eal']
 
-        print("eal mode is", eal)
-        print("Topic data is", session['topic_data'])
+        #print("eal mode is", eal)
+        #print("Topic data is", session['topic_data'])
         return render_template("fill_the_gaps.html", chart=chart, eal=eal, hide_non_topic=session['hide_non_topic'], opt_out=session['opt_out'], topic_data=session['topic_data'])
 
     else:
@@ -317,7 +317,7 @@ def get_hints():
             this_hint['colour'] = "#" + "".join([hex(randrange(200, 255))[2:].zfill(2) for i in range(3)])
 
             final_hints.append(this_hint)
-            print(final_hints)
+            #print(final_hints)
 
 
         return jsonify({"hints":final_hints, "eal_mode":eal_mode})
@@ -345,7 +345,7 @@ def logout():
         current_user = User()
         flash("You have logged out.")
     else:
-        print(e)
+        #print(e)
         flash("No user to log out.", "error")
 
     return redirect(url_for("login"))
@@ -369,8 +369,8 @@ def save_settings():
         eal = request.form.get("eal_mode_toggle")
         no_non_topic = request.form.get("hide_non_topic_toggle")
         opt_out = request.form.get("opt_out_toggle")
-        print("Save settings")
-        print(eal, no_non_topic, opt_out)
+        #print("Save settings")
+        #print(eal, no_non_topic, opt_out)
         save_settings_to_db(eal, no_non_topic, opt_out, current_user.user_id)
         session['eal'], session['hide_non_topic'], session['opt_out'] = [True if i == "true" else False for i in [eal, no_non_topic, opt_out]]
         return "200"
@@ -418,9 +418,15 @@ def login():
 
     return render_template("login.html")
 
+def create_app():
+    return app
+
 
 if __name__ == "__main__":
 
     serve(app, host='0.0.0.0', port=80)
+    #app.run(host="0.0.0.0", port=81)
+
+
 
 

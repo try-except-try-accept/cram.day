@@ -61,8 +61,8 @@ def query_db(query, catch=True, args=None):
 
     res = None
 
-    print("Executing")
-    print(query)
+    #print("Executing")
+    #print(query)
     if args:
         print(args)
 
@@ -76,13 +76,13 @@ def query_db(query, catch=True, args=None):
 
         conn.commit()
         conn.close()
-        print(res)
-        print("Wrote to database")
+        #print(res)
+        #print("Wrote to database")
 
         return res
     except Exception as e:
         conn.close()
-        print(e)
+        #print(e)
         if not catch:
             input("problem")
 
@@ -214,12 +214,12 @@ def get_topic_data():
 
     q = '''SELECT topic_index, topic_name, topic_category FROM topics'''
     results = query_db(q)
-    print(results)
+    #print(results)
     topic_data = {}
     for index, topic in zip([1,2,3,4,5], ["a2", "as", "igcse", "ks3", "pp"]):
         topic_data[index] = Markup(",".join([f'"{row[0]} {row[1]}"' for row in results if row[2] == index]))
 
-    print(topic_data)
+    #print(topic_data)
     return topic_data
 
 
@@ -230,19 +230,19 @@ def check_sanitised(topics=None, not_null_ids=None, null_ints=None):
         for t in topics:
             if not t.replace(".", "").replace("PP", "").replace("Y", "").isdigit():
 
-                print("invalid topic", t)
+                #print("invalid topic", t)
                 return False
 
     if not_null_ids:
         for id_ in not_null_ids:
             if not str(id_).isdigit():
-                print("invalid id", id_)
+                #print("invalid id", id_)
                 return False
 
     if null_ints:
         for num in null_ints:
             if not (str(num).isdigit() or num is None):
-                print("invalid integer (allow null)", num)
+                #print("invalid integer (allow null)", num)
                 return False
 
     return True
@@ -254,7 +254,7 @@ def write_session_to_db(topics, q_repeat, everything, user_id):
 
 
 
-    if not everything and not check_sanitised(topics=topics, not_null_ids=[user_id], null_ints=[q_repeat]):
+    if not check_sanitised(topics=topics, not_null_ids=[user_id], null_ints=[q_repeat]):
         flash("Problem writing to database.", "error")
         return
 
