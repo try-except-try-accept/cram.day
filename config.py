@@ -8,3 +8,10 @@ PASTEL_COLOURS = '''#F2FFFF
 #F2F2FF
 #FFF2F2
 #F2FFF2'''.splitlines()
+
+GAP_HTML = '''<input autocomplete="off" class="gap_textfield"
+type="text"
+style="background-color:{colour}"
+ondrop="drop(event)" ondragover="allow_drop(event)"
+id="answer{i}"
+name="answer{i}" required>'''

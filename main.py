@@ -17,7 +17,7 @@ from user import User
 
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 from helpers import get_chart
-from config import PASTEL_COLOURS
+from config import PASTEL_COLOURS, GAP_HTML
 
 
 
@@ -69,6 +69,8 @@ def perform_replacements(question_tokens, replacements, colour_map, ):
     html_out = ""
     i, skip = 0, 0
 
+    session = {"correct":[]}
+
     for y, word in enumerate(question_tokens):
         if skip:
             skip -= 1
@@ -78,17 +80,13 @@ def perform_replacements(question_tokens, replacements, colour_map, ):
         for rep_word in replacements:
 
             if rep_word in word:
+                print(f"Found {rep_word} in {word}")
                 session['correct'].append(rep_word)
-                add_field = " " + word.replace(rep_word, f'''<input autocomplete="off" class="gap_textfield"
-                                                            type="text"
-                                                            style="background-color:{colour_map[rep_word]}"
-                                                            ondrop="drop(event)" ondragover="allow_drop(event)"
-                                                            id="answer{i}"
-                                                            name="answer{i}" required'
-                                                         f'>''') + " "
+                add_field = " " + word.replace(rep_word, GAP_HTML.format(colour=colour_map[rep_word], i=i)) + " "
                 html_out += add_field
                 replacement_added = True
                 i += 1
+                break
             elif " " in rep_word:
                 parts = rep_word.split(" ")
                 multi_part_gap_found = True
@@ -103,14 +101,11 @@ def perform_replacements(question_tokens, replacements, colour_map, ):
                     session['correct'].append(rep_word)
                     skip = x
 
-                    add_field = " " + f'''<input autocomplete="off" class="gap_textfield"
-                                        type="text"
-                                        style="background-color:{colour_map[rep_word]}"
-                                        ondrop="drop(event)" ondragover="allow_drop(event)"
-                                        name="answer{i}" required>'''
+                    add_field = " " + word.replace(rep_word, GAP_HTML.format(colour=colour_map[rep_word], i=i)) + " "
 
                     html_out += add_field
                     replacement_added = True
+                    i += 1
 
         if not replacement_added:
             html_out += " " + word
