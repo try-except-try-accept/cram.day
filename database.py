@@ -226,12 +226,6 @@ def get_topic_data():
 
 
 def check_sanitised(topics=None, not_null_ids=None, null_ints=None):
-    if topics:
-        for t in topics:
-            if not t.replace(".", "").replace("PP", "").replace("Y", "").isdigit():
-
-                #print("invalid topic", t)
-                return False
 
     if not_null_ids:
         for id_ in not_null_ids:
@@ -279,7 +273,7 @@ FROM questions, sessions
 WHERE questions.topic_index IN ({topics})
 '''
 
-    #print(q)
+    print(q)
     query_db(q)
     #print(q2)
     query_db(q2)
@@ -461,4 +455,4 @@ def get_settings_from_db(user_id):
 
 if __name__ == "__main__":
 
-    test()
+    print(get_topic_data())

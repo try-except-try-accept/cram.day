@@ -17,6 +17,8 @@ from user import User
 
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 from helpers import get_chart
+from config import PASTEL_COLOURS
+
 
 
 app = Flask(__name__)
@@ -63,6 +65,61 @@ def record_answers():
     #############################################################################
 
 
+def perform_replacements(question_tokens, replacements, colour_map, ):
+    html_out = ""
+    i, skip = 0, 0
+
+    for y, word in enumerate(question_tokens):
+        if skip:
+            skip -= 1
+            continue
+
+        replacement_added = False
+        for rep_word in replacements:
+
+            if rep_word in word:
+                session['correct'].append(rep_word)
+                add_field = " " + word.replace(rep_word, f'''<input autocomplete="off" class="gap_textfield"
+                                                            type="text"
+                                                            style="background-color:{colour_map[rep_word]}"
+                                                            ondrop="drop(event)" ondragover="allow_drop(event)"
+                                                            id="answer{i}"
+                                                            name="answer{i}" required'
+                                                         f'>''') + " "
+                html_out += add_field
+                replacement_added = True
+                i += 1
+            elif " " in rep_word:
+                parts = rep_word.split(" ")
+                multi_part_gap_found = True
+
+                for x in range(len(parts)):
+                    next_token_index = y + x
+
+                    if next_token_index >= len(question_tokens) or parts[x] != question_tokens[next_token_index]:
+                        multi_part_gap_found = False
+                        break
+                if multi_part_gap_found:
+                    session['correct'].append(rep_word)
+                    skip = x
+
+                    add_field = " " + f'''<input autocomplete="off" class="gap_textfield"
+                                        type="text"
+                                        style="background-color:{colour_map[rep_word]}"
+                                        ondrop="drop(event)" ondragover="allow_drop(event)"
+                                        name="answer{i}" required>'''
+
+                    html_out += add_field
+                    replacement_added = True
+
+        if not replacement_added:
+            html_out += " " + word
+
+
+    return html_out
+
+    #############################################################################
+
 def create_question():
     '''Choose random question based on session params'''
 
@@ -89,56 +146,22 @@ def create_question():
         session['correct'] = []
         html_out = ""
 
+        colours = list(PASTEL_COLOURS)
+        shuffle(colours)
 
-        i = 0
+        colour_map = {rep:colours.pop(0) for rep in " ".join(replacements).split()}
+
+
+
         question_tokens = question.split(" ")
 
-        skip = 0
-
-        for y, word in enumerate(question_tokens):
-            if skip:
-                skip -= 1
-                continue
-
-            replacement_added = False
-            for rep_word in replacements:
-
-                if rep_word in word:
-                    session['correct'].append(rep_word)
-                    add_field = " " + word.replace(rep_word, f'''<input autocomplete="off" class="gap_textfield"
-                                                                type="text" 
-                                                                ondrop="drop(event)" ondragover="allow_drop(event)"
-                                                                id="answer{i}"
-                                                                name="answer{i}" required'
-                                                             f'>''') + " "
-                    html_out += add_field
-                    replacement_added = True
-                    i += 1
-                elif " " in rep_word:
-                    parts = rep_word.split(" ")
-                    multi_part_gap_found = True
-
-                    for x in range(len(parts)):
-                        next_token_index = y+x
-
-                        if next_token_index >= len(question_tokens) or parts[x] != question_tokens[next_token_index]:
-                            multi_part_gap_found = False
-                            break
-                    if multi_part_gap_found:
-
-                        session['correct'].append(rep_word)
-                        skip = x
-
-                        add_field = " " + f'<input autocomplete="off" class="gap_textfield" type="text" name="answer{i}" required>'
-                        html_out += add_field
-                        replacement_added = True
 
 
+        for var, val in locals().items():
+            print(var, "=", val)
 
-            if not replacement_added:
-                html_out += " " + word
 
-
+        html_out = perform_replacements(question_tokens, replacements, colour_map)
 
 
         session['question'] = question
@@ -251,6 +274,7 @@ def begin_session():
             topics = request.form.get("selected_topics").split(",")
             q_repeat = request.form.get("q_repeat")
             everything = bool(request.form.get("everything").replace("false", ""))
+            print("was everything chosen", everything)
             if q_repeat == "infinity":
                 q_repeat = None
 

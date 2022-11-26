@@ -378,11 +378,13 @@ function mark_element(child, feedback_queue)
         if (next_correct != null)
         {
            text_input_feedback = "✘" + next_correct;
+           child.style.backgroundColor = null;
            child.classList.add("incorrect");
         }
         else
         {
            text_input_feedback = "✔" + child.value;
+           child.style.backgroundColor = null;
            child.classList.add("correct");
         }
 
@@ -583,15 +585,19 @@ function begin_session()
         form_data.append("everything", false)
 
 
+
+
         topics = document.getElementsByClassName("topic_checkbox");
 
         for (let t of topics)
         {
-            if (t.checked) { selected_topics.push(t.getAttribute("name"))}
+            if (t.checked) { console.log(t.getAttribute("name")); selected_topics.push(t.getAttribute("name"))}
         }
         q_repeat = document.getElementById("q_repeat").value
 
         $('#choose_topics_modal').modal('toggle');
+
+        console.log(form_data)
     }
     form_data.append("selected_topics", selected_topics);
 
