@@ -65,6 +65,22 @@
 
     <link href="static/styles/fill_the_gaps.css" rel="stylesheet" type="text/css">
 
+    <style>
+        {% if display_mode == 1 %}
+
+        body, .modal-content { background-color:#0d1117; color:#c9d1d9 }
+        input { background-color:#0d1109; color:#c9d1d9 }
+        code { color:#58a6ff; }
+
+        {% elif display_mode == 2 %}
+
+        body, .modal-content { background-color:#fffff6; color:#111 }
+        code { color:#001155; }
+
+        {% endif %}
+
+    </style>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
 
 </head>
@@ -239,7 +255,33 @@
                         <div class="checkbox">
                             <label><input type="checkbox" name="opt_out_toggle" data-toggle="toggle" {% if opt_out %}checked{% endif %}>Opt out of leaderboards completely</label>
                         </div>
+                        <div class="checkbox">
+                            <label><input type="checkbox" name="highlight_toggle" data-toggle="toggle" {% if highlight %}checked{% endif %}>Highlight gaps to show repeated words</label>
+                        </div>
 
+                        <div>
+                            <label>
+                                Choose leaderboard mode:
+                            <select name="leaderboard_mode_dropdown">
+                                <option name="success_rate" value="success rate" {% if leaderboard_mode == 0 %}selected{% endif %}>success rate</option>
+                                <option name="num_correct_answers" value="number of correct answers" {% if leaderboard_mode == 1 %}selected{% endif %}>number of correct answers</option>
+                                <option name="biggest_improvement" value="biggest improvement" disabled {% if leaderboard_mode == 2 %}selected{% endif %}>biggest improvement (coming soon)</option>
+                            </select>
+
+                            </label>
+                        </div>
+
+                        <div>
+                            <label>
+                                Choose display setting:
+                            <select name="display_mode_dropdown" onchange="signal_refresh_needed();">
+                                <option name="light mode" value="light mode" {% if display_mode == 0 %}selected{% endif %}>light mode</option>
+                                <option name="dark mode" value="dark mode" {% if display_mode == 1 %}selected{% endif %}>dark mode</option>
+                                <option name="cream_mode" value="cream mode" {% if display_mode == 2 %}selected{% endif %}>cream mode</option>
+                            </select>
+
+                            </label>
+                        </div>
 
                     </form>
 

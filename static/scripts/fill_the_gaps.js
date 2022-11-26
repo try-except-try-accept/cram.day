@@ -1,3 +1,5 @@
+refresh = false;
+
 selected_hint = null;
 
 
@@ -555,6 +557,23 @@ function save_settings()
     {
         form_data.append(setting.getAttribute("name"), setting.checked);
     }
+    for (let setting of document.querySelectorAll('select'))
+    {
+        const setting_name = setting.getAttribute("name");
+        form_data.append(setting_name, setting.value);
+
+    }
+
+    let msg = "settings saved"
+
+    if (refresh)
+    {
+        console.log("refreshing in 2.5 seconds")
+        setTimeout(function(){
+        window.location.reload(1);
+        }, 2500);
+        msg = msg + " - reloading shortly"
+    }
 
     fetch('/save_settings',
     {
@@ -566,7 +585,9 @@ function save_settings()
     return res.text()})
     .then(data => {
     $('#settings_modal').modal('toggle');
-     display_message("settings saved") } );
+     display_message(msg) } );
+
+
 
 }
 
@@ -667,4 +688,9 @@ function drop(ev)
   let data = ev.dataTransfer.getData("text");
   console.log("The target was", ev.target);
   ev.target.value = data;
+}
+
+function signal_refresh_needed()
+{
+    refresh = true;
 }

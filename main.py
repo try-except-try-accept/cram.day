@@ -17,7 +17,7 @@ from user import User
 
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 from helpers import get_chart
-from config import PASTEL_COLOURS, GAP_HTML
+from config import GAP_HTML, DARK_MODE_COLOURS, LIGHT_MODE_COLOURS
 
 
 
@@ -62,13 +62,25 @@ def record_answers():
 
     pass
 
-    #############################################################################
+#############################################################################
 
+def reload_settings(user_id):
+    session['eal'], \
+    session['hide_non_topic'], \
+    session['opt_out'], \
+    session['leaderboard_mode'], \
+    session['display_mode'], \
+    session['highlight'] = get_settings_from_db(user_id)[0]
 
-def perform_replacements(question_tokens, replacements, colour_map, test_mode=False):
+#############################################################################
+
+def perform_replacements(question_tokens, replacements, colour_map, dark_mode):
     html_out = ""
     i, skip = 0, 0
 
+    html_gap = GAP_HTML
+    if dark_mode:
+        html_gap = html_gap.replace("background-color:{colour}", "border:thin {colour} solid")
 
 
     for y, word in enumerate(question_tokens):
@@ -83,7 +95,7 @@ def perform_replacements(question_tokens, replacements, colour_map, test_mode=Fa
             if rep_word in word:
                 print(f"Found {rep_word} in {word}")
                 session['correct'].append(rep_word)
-                add_field = " " + word.replace(rep_word, GAP_HTML.format(colour=colour_map[rep_word], i=i)) + " "
+                add_field = " " + word.replace(rep_word, html_gap.format(colour=colour_map[rep_word], i=i)) + " "
                 html_out += add_field
                 replacement_added = True
                 i += 1
@@ -110,7 +122,7 @@ def perform_replacements(question_tokens, replacements, colour_map, test_mode=Fa
                     for part in parts:
                         print(f"i'll replace {part} with a gap")
                         session['correct'].append(part)
-                        add_field = " " + add_field.replace(part, GAP_HTML.format(colour=colour_map[part], i=i)) + " "
+                        add_field = " " + add_field.replace(part, html_gap.format(colour=colour_map[part], i=i)) + " "
 
                     html_out += add_field
                     replacement_added = True
@@ -150,11 +162,16 @@ def create_question():
         session['correct'] = []
         html_out = ""
 
-        colours = list(PASTEL_COLOURS)
+        dark_mode = 1 == session['display_mode']
+        highlight = session['highlight']
+
+        colours = list(DARK_MODE_COLOURS if dark_mode else LIGHT_MODE_COLOURS)
         shuffle(colours)
 
-        colour_map = {rep:colours.pop(0) for rep in " ".join(replacements).split()} # join up and resplit to handle rep words with spaces
-
+        static_colour = "#111111" if dark_mode else "#FEFEFE"
+        print("Highlight is", highlight)
+        colour_map = {rep:colours.pop(0) if highlight else static_colour
+                      for rep in " ".join(replacements).split()} # join up and resplit to handle rep words with spaces
 
 
         question_tokens = question.split(" ")
@@ -165,7 +182,7 @@ def create_question():
             print(var, "=", val)
 
 
-        html_out = perform_replacements(question_tokens, replacements, colour_map)
+        html_out = perform_replacements(question_tokens, replacements, colour_map, dark_mode)
 
 
         session['question'] = question
@@ -313,10 +330,16 @@ def fill_the_gaps():
             session['lose_streak'] = []
 
         eal = session['eal']
+        display_mode = session['display_mode']
+        leaderboard_mode = session['leaderboard_mode']
+        highlight = session['highlight']
 
         #print("eal mode is", eal)
         #print("Topic data is", session['topic_data'])
-        return render_template("fill_the_gaps.html", chart=chart, eal=eal, hide_non_topic=session['hide_non_topic'], opt_out=session['opt_out'], topic_data=session['topic_data'])
+        return render_template("fill_the_gaps.html", chart=chart, eal=eal, display_mode=display_mode,
+                               highlight=highlight, leaderboard_mode=leaderboard_mode,
+                               hide_non_topic=session['hide_non_topic'], opt_out=session['opt_out'],
+                               topic_data=session['topic_data'])
 
     else:
         return redirect(url_for('login'))
@@ -398,10 +421,19 @@ def save_settings():
         eal = request.form.get("eal_mode_toggle")
         no_non_topic = request.form.get("hide_non_topic_toggle")
         opt_out = request.form.get("opt_out_toggle")
+        highlight = request.form.get("highlight_toggle")
+        leaderboard_mode = request.form.get("leaderboard_mode_dropdown")
+        display_mode = request.form.get("display_mode_dropdown")
         #print("Save settings")
         #print(eal, no_non_topic, opt_out)
-        save_settings_to_db(eal, no_non_topic, opt_out, current_user.user_id)
-        session['eal'], session['hide_non_topic'], session['opt_out'] = [True if i == "true" else False for i in [eal, no_non_topic, opt_out]]
+        save_settings_to_db(eal, no_non_topic, opt_out, leaderboard_mode, display_mode, highlight, current_user.user_id)
+        session['eal'], session['hide_non_topic'], session['opt_out'], session['highlight'] = [True if i == "true" else
+                                                                                               False for i in [eal,
+                                                                                                               no_non_topic,
+                                                                                                               opt_out,
+                                                                                                               highlight]]
+        reload_settings(current_user.user_id)
+        session['topic_data'] = get_topic_data()
         return "200"
     else:
         return "404"
@@ -437,7 +469,7 @@ def login():
             if username == this_user.username and password == this_user.password:
                 login_user(this_user)
                 flash('Logged in successfully ' + username + " - now choose your topics!")
-                session['eal'], session['hide_non_topic'], session['opt_out'] = get_settings_from_db(user_id)[0]
+                reload_settings(user_id)
                 session['topic_data'] = get_topic_data()
                 return redirect(url_for('fill_the_gaps'))
             else:

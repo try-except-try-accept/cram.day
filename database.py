@@ -298,7 +298,7 @@ DESC LIMIT 10'''
         data = read_leaderboard_from_db()[0]
         title = f"Top 25 Most Engaged Students (Total Number of Correct Answers)"
     else:
-        letter = chr(randint(65, 65+26))
+        letter = chr(randint(65, 65+25))
         if letter in "XQ":
             letter = choice("APT")
 
@@ -447,12 +447,29 @@ LIMIT 25'''
     return overall_leaderboard, last_hour_leaderboard
 
 
-def save_settings_to_db(eal, non_topic, opt_out, user_id):
-    q = f"UPDATE users SET eal_mode={eal}, hide_non_topic={non_topic}, opt_out={opt_out} WHERE user_id = {user_id}"
+def save_settings_to_db(eal, non_topic, opt_out, leaderboard_mode, display_mode, highlight, user_id):
+    print("saving", display_mode, leaderboard_mode)
+    leaderboard_mode = LEADERBOARD_MODES.index(leaderboard_mode)
+    display_mode = DISPLAY_MODES.index(display_mode)
+
+    q = f"""
+UPDATE
+    users
+SET 
+    eal_mode={eal},
+    hide_non_topic={non_topic},
+    opt_out={opt_out},
+    highlight={highlight},
+    leaderboard_mode={leaderboard_mode},
+    display_mode={display_mode}
+WHERE
+    user_id = {user_id}"""
     query_db(q)
 
+
+
 def get_settings_from_db(user_id):
-    q = f"SELECT eal_mode, hide_non_topic, opt_out FROM users WHERE user_id = {user_id}"
+    q = f"SELECT eal_mode, hide_non_topic, opt_out, leaderboard_mode, display_mode, highlight FROM users WHERE user_id = {user_id}"
     return query_db(q)
 
 if __name__ == "__main__":
