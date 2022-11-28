@@ -19,7 +19,7 @@ def load_user_creds(user_id=None, username=None):
     else:
         result = query_db(f'SELECT user_id, username, code from users where user_id = "{user_id}"')
 
-    print(result)
+    #print(result)
 
     if result is None or len(result) == 0:
         return None
@@ -62,12 +62,12 @@ def query_db(query, catch=True, args=None):
 
     #print("Executing")
     #print(query)
-    if args:
-        print(args)
+    #if args:
+        #print(args)
 
     try:
         if args is None:
-            print(query)
+            #print(query)
             res = cursor.execute(query)
         else:
             res = cursor.execute(query, (*args,))
@@ -241,7 +241,7 @@ def get_topic_data():
 
 
 def check_sanitised(topics=None, not_null_ids=None, null_ints=None):
-    print(topics, not_null_ids, null_ints)
+    #print(topics, not_null_ids, null_ints)
     if not_null_ids:
         for id_ in not_null_ids:
             if not str(id_).isdigit():
@@ -281,7 +281,7 @@ SET in_use_flag = CASE WHEN question_id IN (SELECT question_id FROM questions WH
 THEN 1 ELSE 0 END, gen_count = {q_repeat}
 WHERE sessions.user_id = {user_id}'''
 
-    print(q)
+    #print(q)
 
     q2 = f'''
 INSERT OR IGNORE INTO sessions (user_id, question_id, in_use_flag, gen_count)
@@ -290,7 +290,7 @@ FROM questions, sessions
 WHERE questions.topic_index IN ({topics})
 '''
 
-    print(q)
+    #print(q)
     query_db(q)
     #print(q2)
     query_db(q2)
@@ -336,7 +336,7 @@ def get_chart_data():
 def get_misnomers(correct, user_id, num_hints):
     q = f'''SELECT DISTINCT questions.gaps
 FROM questions, users, sessions
-WHERE users.user_id = 1181
+WHERE users.user_id = {user_id}
 AND (users.hide_non_topic = 0
 OR 
 (sessions.in_use_flag = 1
@@ -468,7 +468,7 @@ LIMIT 25'''
 
 
 def save_settings_to_db(eal, non_topic, opt_out, leaderboard_mode, display_mode, highlight, user_id):
-    print("saving", display_mode, leaderboard_mode)
+    #print("saving", display_mode, leaderboard_mode)
     leaderboard_mode = LEADERBOARD_MODES.index(leaderboard_mode)
     display_mode = DISPLAY_MODES.index(display_mode)
 

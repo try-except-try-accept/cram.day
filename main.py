@@ -38,13 +38,13 @@ def get_stats():
         for position, row in enumerate(overall):
             username = row[1]
             points = row[3]
-            if mode == 1:   points = f"{round(points, 2)}%"
+            if mode == 0:   points = f"{round(points, 2)}%"
             leaderboard_data['overall'][username] = [position, points]
 
         for position, row in enumerate(last_hour):
             username = row[1]
             points = row[3]
-            if mode == 1:   points = f"{round(points, 2)}%"
+            if mode == 0:   points = f"{round(points, 2)}%"
             leaderboard_data['last_hour'][username] = [position, points]
 
         return leaderboard_data
@@ -83,14 +83,14 @@ def perform_replacements(question_tokens, replacements, colour_map, dark_mode):
     for y, word in enumerate(question_tokens):
         if skip:
             skip -= 1
-            print("skipped", word)
+            #print("skipped", word)
             continue
 
         replacement_added = False
         for rep_word in replacements:
 
             if rep_word in word:
-                print(f"Found {rep_word} in {word}")
+                #print(f"Found {rep_word} in {word}")
                 session['correct'].append(rep_word)
                 add_field = " " + word.replace(rep_word, html_gap.format(colour=colour_map[rep_word], i=i)) + " "
                 html_out += add_field
@@ -105,19 +105,19 @@ def perform_replacements(question_tokens, replacements, colour_map, dark_mode):
                     next_token_index = y + x
 
                     if next_token_index >= len(question_tokens) or parts[x] != question_tokens[next_token_index]:
-                        print("Did not find multi part gap")
+                        #print("Did not find multi part gap")
                         multi_part_gap_found = False
                         break
                     else:
                         new_word += " " + question_tokens[next_token_index]
                 if multi_part_gap_found:
-                    print("Found multi part gap")
+                    #print("Found multi part gap")
                     skip = x
 
                     add_field = new_word
 
                     for part in parts:
-                        print(f"i'll replace {part} with a gap")
+                        #print(f"i'll replace {part} with a gap")
                         session['correct'].append(part)
                         add_field = " " + add_field.replace(part, html_gap.format(colour=colour_map[part], i=i)) + " "
 
@@ -166,7 +166,7 @@ def create_question():
         shuffle(colours)
 
         static_colour = "#111111" if dark_mode else "#FEFEFE"
-        print("Highlight is", highlight)
+        #print("Highlight is", highlight)
         colour_map = {rep:colours.pop(0) if highlight else static_colour
                       for rep in " ".join(replacements).split()} # join up and resplit to handle rep words with spaces
 
@@ -174,9 +174,6 @@ def create_question():
         question_tokens = question.split(" ")
 
 
-
-        for var, val in locals().items():
-            print(var, "=", val)
 
 
         html_out = perform_replacements(question_tokens, replacements, colour_map, dark_mode)
@@ -293,7 +290,7 @@ def begin_session():
             topics = request.form.get("selected_topics").split(",")
             q_repeat = request.form.get("q_repeat")
             everything = bool(request.form.get("everything").replace("false", ""))
-            print("was everything chosen", everything)
+            #print("was everything chosen", everything)
             if q_repeat in ["infinity", "null"]: # either default mode or everything mode
                 q_repeat = None
 
