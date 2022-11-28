@@ -297,36 +297,38 @@ WHERE questions.topic_index IN ({topics})
 
 def get_chart_data():
 
-    if not randint(0, 2):
-        correct = randint(0, 1)
-        q = f'''
-SELECT answer, COUNT(answer) as county
-FROM answers 
-WHERE correct = {correct}
-AND LENGTH(answer) > 2
-GROUP BY answer
-ORDER BY county
-DESC LIMIT 10'''
-        title = f"Most Popular {'Correct' if correct else 'Incorrect'} Answers"
-        data = query_db(q)
-    elif randint(0, 2):
-        data = read_leaderboard_from_db()[0]
-        title = f"Top 25 Most Engaged Students (Total Number of Correct Answers)"
-    else:
-        letter = chr(randint(65, 65+25))
-        if letter in "XQ":
-            letter = choice("APT")
+    data = None
 
-        q = f'''SELECT users.user_id,
-SUM(CASE WHEN answers.correct = 1 THEN 1 ELSE 0 END),
-COUNT(answers.answer)
-FROM answers, users
-WHERE answers.user_id = users.user_id
-AND answers.answer != ""
-AND SUBSTRING(users.nickname, 1, 1)="{letter}"
-GROUP BY username'''
-        data = query_db(q)
-        title = f"% Success Rate - Students Whose Name Begin With The Letter '{letter}'"
+    while data is None:
+
+        if not randint(0, 2):
+            correct = randint(0, 1)
+            q = f'''
+    SELECT answer, COUNT(answer) as county
+    FROM answers 
+    WHERE correct = {correct}
+    AND LENGTH(answer) > 2
+    GROUP BY answer
+    ORDER BY county
+    DESC LIMIT 10'''
+            title = f"Most Popular {'Correct' if correct else 'Incorrect'} Answers"
+            data = query_db(q)
+        elif randint(0, 1):
+            data = read_leaderboard_from_db(mode=0)[0]
+            title = f"Top 25 Most Engaged Students (Total Number of Correct Answers)"
+        else:
+            digit = randint(0, 9)
+
+            q = f'''SELECT users.user_id,
+    SUM(CASE WHEN answers.correct = 1 THEN 1 ELSE 0 END),
+    COUNT(answers.answer)
+    FROM answers, users
+    WHERE answers.user_id = users.user_id
+    AND answers.answer != ""
+    AND SUBSTRING(users.nickname, 6, 1)="{digit}"
+    GROUP BY username'''
+            data = query_db(q)
+            title = f"% Success Rate - Students Whose Roll Number Ends In A '{digit}'"
 
 
     return {"title":title, "data":data}
@@ -412,15 +414,18 @@ INSERT INTO answers (answer, correct, user_id, time_stamp) VALUES '''
     query_db(q)
 
 
-def read_leaderboard_from_db():
+def read_leaderboard_from_db(mode):
     """Returns overall leaderboard and last hour leaderboard"""
+    count_answer_query = "SUM(answers.correct) as overall"
+    if mode == 0:
+        count_answer_query = "(cast(SUM(answers.correct) AS REAL) / COUNT(answers.correct)) * 100 as overall"
 
-    q = '''
+    q = f'''
     SELECT
        answers.user_id as user,   
        users.username,
        users.username,
-       SUM(answers.correct) as overall
+       {count_answer_query}
     FROM
        answers, users
     WHERE
@@ -441,7 +446,7 @@ SELECT
    answers.user_id as user,
    users.username,   
    users.username,
-   SUM(answers.correct) as overall
+   {count_answer_query}
 FROM
    answers, users
 WHERE

@@ -29,19 +29,22 @@ def get_stats():
     '''Read database and return leaderboard'''
 
     if current_user.is_authenticated:
+        mode = session['leaderboard_mode']
 
-        overall, last_hour = read_leaderboard_from_db()
+        overall, last_hour = read_leaderboard_from_db(mode)
 
         leaderboard_data = {"overall":{}, "last_hour": {}}
 
         for position, row in enumerate(overall):
             username = row[1]
             points = row[3]
+            if mode == 1:   points = f"{round(points, 2)}%"
             leaderboard_data['overall'][username] = [position, points]
 
         for position, row in enumerate(last_hour):
             username = row[1]
             points = row[3]
+            if mode == 1:   points = f"{round(points, 2)}%"
             leaderboard_data['last_hour'][username] = [position, points]
 
         return leaderboard_data

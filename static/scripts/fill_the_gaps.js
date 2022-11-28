@@ -192,7 +192,11 @@ function update_slot(name, new_pos, pts, leaderboard,table_name)
 function update_leaderboard(table_name, leaderboards_update)
 {
 
+
+
     let current_leaderboard = document.getElementById(table_name+"_leaderboard");
+
+    if (leaderboards_update === null) { current_leaderboard.innerHTML = ""; return }
 
     let update = leaderboards_update[table_name];
 
@@ -693,4 +697,10 @@ function drop(ev)
 function signal_refresh_needed()
 {
     refresh = true;
+}
+
+function destroy_leaderboard()
+{
+    update_leaderboard("overall", null);
+    update_leaderboard("last_hour", null);
 }

@@ -262,7 +262,7 @@
                         <div>
                             <label>
                                 Choose leaderboard mode:
-                            <select name="leaderboard_mode_dropdown">
+                            <select name="leaderboard_mode_dropdown" onchange="destroy_leaderboard();">
                                 <option name="success_rate" value="success rate" {% if leaderboard_mode == 0 %}selected{% endif %}>success rate</option>
                                 <option name="num_correct_answers" value="number of correct answers" {% if leaderboard_mode == 1 %}selected{% endif %}>number of correct answers</option>
                                 <option name="biggest_improvement" value="biggest improvement" disabled {% if leaderboard_mode == 2 %}selected{% endif %}>biggest improvement (coming soon)</option>
