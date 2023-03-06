@@ -227,7 +227,7 @@ def sync_data_with_db():
 
 def get_topic_data():
 
-    q = '''SELECT topic_index, topic_name, topic_category FROM topics'''
+    q = '''SELECT topic_index, topic_name, topic_category FROM topics ORDER BY topic_index'''
     results = query_db(q)
     #print(results)
     topic_data = {}
