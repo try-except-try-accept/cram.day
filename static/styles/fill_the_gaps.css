@@ -211,6 +211,16 @@ h2
     padding-left:1em;
 }
 
+.indent2
+{
+    padding-left:2em;
+}
+
+.indent3
+{
+    padding-left:3em;
+}
+
 
 .message
 {
