@@ -1,3 +1,5 @@
+leaderboard_participation = true;
+allow_submit = true;
 refresh = false;
 
 selected_hint = null;
@@ -29,10 +31,12 @@ function toggle_leaderboard()
     if (toggle_btn.textContent.indexOf("hide") == -1)
     {
         toggle_btn.textContent = "hide leaderboards"
+        leaderboard_participation = true;
     }
     else
     {
         toggle_btn.textContent = "show leaderboards"
+        leaderboard_particpation = false;
     }
 }
 
@@ -494,24 +498,36 @@ function process_feedback(feedback, scores)
 
 }
 
+function reset_timer()
+{
+    allow_submit = true;
+}
+
+
 function submit_answer()
 {
+
+    if (!allow_submit)  { return false; }
+
     answers = question.querySelectorAll(".gap_textfield");
     answers_given = [];
-    let some_answer = false;
+    let blank_answers = false;
     let this_answer = "";
     for (let a of answers)
     {
         this_answer = a.value;
         answers_given.push(this_answer);
-        if (this_answer) { some_answer = true }
+        if (this_answer.length === 0) { blank_answers = true }
     }
 
-    if (!some_answer)
+    if (blank_answers)
     {
-        display_message("Please give an answer...");
+        display_message("Please fill out all answers...");
         return false;
     }
+
+    allow_submit = false;
+    setTimeout(reset_timer, 800);
 
     kill_non_text_elems();
     let form_data = new FormData();
@@ -542,8 +558,12 @@ function submit_answer()
     display_message(data.message);
     update_score(data.total);
 
-    update_leaderboard("overall", data.leaderboards);
-    update_leaderboard("last_hour", data.leaderboards);
+
+    if (leaderboard_participation)
+    {
+        update_leaderboard("overall", data.leaderboards);
+        update_leaderboard("last_hour", data.leaderboards);
+    }
 
 
     animate_feedback(fb_anim, data);

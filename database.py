@@ -210,7 +210,7 @@ def sync_data_with_db():
 
     fill_gaps = sh.worksheet('topics')
     data = fill_gaps.get("A2:C1000")
-    q = "INSERT OR IGNORE INTO topics (topic_id, topic_index, topic_name, topic_category) VALUES "
+    q = "INSERT OR REPLACE INTO topics (topic_id, topic_index, topic_name, topic_category) VALUES "
     for row in data:
         index = row[1].split(" ")[0]
         name = " ".join(row[1].split(" ")[1:])
