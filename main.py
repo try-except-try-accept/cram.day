@@ -407,7 +407,7 @@ def home():
 
 @app.route("/answer_sync")
 def answer_sync():    
-    return sync_answer_data()
+    return sync_answer_data(load_gsheet())
     
 
 @app.route("/all_sync")
