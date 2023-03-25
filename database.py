@@ -54,6 +54,8 @@ def authenticate_user(username, password):
         return {'user_id':str(result[0][0]).strip(), 'display_name':result[0][1].strip(), 'username':username}
 
 
+def get_last_n_answers(n):
+    return query_db("SELECT timestamp FROM answers ORDER BY timestamp DESC LIMIT ?", args=(n))
 
 def query_db(query, catch=True, args=None):
 
@@ -104,6 +106,9 @@ def test():
     exit()
 
 
+
+
+
 def spreadsheet_to_query_placeholders(data):
     """Create 1D list of query args and (?, ?) style placeholders"""
     rows = len(data)
@@ -121,6 +126,10 @@ def spreadsheet_to_query_placeholders(data):
 
 
 def sync_question_data(sh):
+    
+    # sync spreadsheet question data with database
+    query_db("DELETE FROM questions")
+
     fill_gaps = sh.worksheet('fill_gaps')
     data = fill_gaps.get("A2:D1000")
 
@@ -209,23 +218,24 @@ def sync_answer_data(sh):
     ss.update(f'A1', all_answers)
     return answer_data_conf
 
-
-def sync_data_with_db():
-    """Connects to google sheet and updates question data / answer data
-    run periodically according to quota"""
-
-    # sync spreadsheet question data with database
-    query_db("DELETE FROM questions")
-
-
-
+def load_gsheet():
+    """Opens backup gsheet"""
+    
     try:
         gc = gspread.service_account(filename=environ["GOOGLE_SERVICE_ACCOUNT"])
     except:
         gc = gspread.service_account_from_dict(loads(environ["GOOGLE_SERVICE_ACCOUNT"]))
 
-    sh = gc.open('CRAM Data Source')
+    return gc.open('CRAM Data Source')
 
+
+
+def sync_data_with_db():
+    """Connects to google sheet and updates question data / answer data
+    run periodically according to quota"""
+
+
+    sh = load_gsheet()
     
     
     question_data_conf = sync_question_data(sh)
