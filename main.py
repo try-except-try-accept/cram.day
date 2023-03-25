@@ -284,35 +284,13 @@ def submit_answer():
 
 #############################################################################
 
-async def check_and_run_sync_if_needed():   
-    sync_answer_data(load_gsheet())
-    with open("static/activity", "w") as f:
-        pass
-    sleep(WAIT_BEFORE_RESYNC)
-    sync_answer_data(load_gsheet())
-    os.remove("static/activity")
-
-        
-@app.route("/process_answer_sync")
-async def process_answer_sync():
-    await check_and_run_sync_if_needed()
-    return Response({"status":200})
- 
-#############################################################################
 
 @app.route("/begin_session", methods=["GET", "POST"])
 def begin_session():
     if current_user.is_authenticated:
         out = "<p>So you want to study</p>"
         if request.method == "POST":
-            if not os.path.exists("static/activity"):
-                print(f"User activity detected - sync, and resync again in {WAIT_BEFORE_RESYNC} seconds")
-                get("https://cramdotday.herokuapp.com/process_answer_sync")
-            else:
-                print("User activity already detected.")
-
-
-            
+                        
             topics = request.form.get("selected_topics").split(",")
             q_repeat = request.form.get("q_repeat")
             everything = bool(request.form.get("everything").replace("false", ""))
@@ -427,8 +405,13 @@ def home():
     return redirect(url_for(("login")))
 
 
-@app.route("/db_sync")
-def db_sync():
+@app.route("/answer_sync")
+def answer_sync():    
+    return sync_answer_data()
+    
+
+@app.route("/all_sync")
+def all_sync():
 
     if current_user.is_admin:
         return sync_data_with_db()
