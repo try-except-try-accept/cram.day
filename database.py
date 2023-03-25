@@ -127,19 +127,8 @@ def sync_data_with_db():
 
 
 
-    try:
-        gc = gspread.service_account(environ["GOOGLE_SERVICE_ACCOUNT"])
-    except:
-        print("Loading from system env var")
 
-        try:
-            gc = gspread.service_account()
-        except:
-            with open("~/.config/gspread/service_account.json", "w") as f:
-                f.write(environ("CRAM_DAY_GSUITE"))
-
-            gc = gspread.service_account()
-
+    gc = gspread.service_account(filename=environ["GOOGLE_SERVICE_ACCOUNT"])
 
     sh = gc.open('CRAM Data Source')
 
