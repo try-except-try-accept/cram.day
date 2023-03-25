@@ -305,7 +305,7 @@ def begin_session():
         out = "<p>So you want to study</p>"
         if request.method == "POST":
             if not os.path.exists("static/activity"):
-                print(f"User activity detected - sync, and resync again in {WAIT_BEFORE_RESYNC} seconds"}
+                print(f"User activity detected - sync, and resync again in {WAIT_BEFORE_RESYNC} seconds")
                 get("https://cramdotday.herokuapp.com/process_answer_sync")
             else:
                 print("User activity already detected.")
