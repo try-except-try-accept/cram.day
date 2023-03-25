@@ -11,7 +11,12 @@ from os import environ
 # daemon/periodic update -> server updates questions table based on gspread
 from datetime import datetime
 from random import sample, shuffle, randint, choice
-
+from boto.s3.connection import S3Connection
+from boto.exception import NoAuthHandlerFound as BotoError
+try:
+    s3 = S3Connection(environ['GOOGLE_SERVICE_ACCOUNT'])
+except BotoError:
+    print("Assume running locally")
 
 def load_user_creds(user_id=None, username=None):
     if username:
@@ -123,7 +128,7 @@ def sync_data_with_db():
 
 
     try:
-        gc = gspread.service_account(filename="secret/cram-revision-app-5da8bea462ae.json")
+        gc = gspread.service_account(environ["GOOGLE_SERVICE_ACCOUNT"])
     except:
         print("Loading from system env var")
 
