@@ -12,7 +12,7 @@ from user import User
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 from helpers import get_chart
 from config import GAP_HTML, DARK_MODE_COLOURS, LIGHT_MODE_COLOURS
-
+from waitress import serve
 
 
 app = Flask(__name__)
@@ -479,7 +479,7 @@ def create_app():
 
 if __name__ == "__main__":
 
-    app.run(host="0.0.0.0", port=81)
+    serve(app, port="80")
 
 
 
