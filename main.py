@@ -1,9 +1,9 @@
-from flask import Flask, session, url_for, render_template, request, Markup, jsonify, redirect, flash
+from flask import Flask, session, url_for, render_template, request, Markup, jsonify, redirect, flash, Response
 from random import choice, randrange, shuffle, sample, randint
 from uuid import uuid4
 from database import write_session_to_db, get_question_data,save_answers_to_db, read_leaderboard_from_db, \
                      get_misnomers, authenticate_user, load_user_creds, sync_data_with_db, save_settings_to_db, \
-                     get_settings_from_db, get_topic_data
+                     get_settings_from_db, get_topic_data, load_gsheet, sync_answer_data
 
 
 
@@ -11,9 +11,10 @@ from user import User
 
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 from helpers import get_chart
-from config import GAP_HTML, DARK_MODE_COLOURS, LIGHT_MODE_COLOURS
+from config import GAP_HTML, DARK_MODE_COLOURS, LIGHT_MODE_COLOURS, WAIT_BEFORE_RESYNC
 from waitress import serve
-
+import os
+from time import sleep
 
 app = Flask(__name__)
 app.secret_key = uuid4().hex
@@ -282,11 +283,35 @@ def submit_answer():
 
 #############################################################################
 
+async def check_and_run_sync_if_needed():   
+    sync_answer_data(load_gsheet())
+    with open("static/activity", "w") as f:
+        pass
+    sleep(WAIT_BEFORE_RESYNC)
+    sync_answer_data(load_gsheet())
+    os.remove("static/activity")
+
+        
+@app.route("/process_answer_sync")
+async def process_answer_sync():
+    await check_and_run_sync_if_needed()
+    return Response({"status":200})
+ 
+#############################################################################
+
 @app.route("/begin_session", methods=["GET", "POST"])
 def begin_session():
     if current_user.is_authenticated:
         out = "<p>So you want to study</p>"
         if request.method == "POST":
+            if not os.path.exists("static/activity"):
+                print(f"User activity detected - sync, and resync again in {WAIT_BEFORE_RESYNC} seconds"}
+                get("https://cramdotday.herokuapp.com/process_answer_sync")
+            else:
+                print("User activity already detected.")
+
+
+            
             topics = request.form.get("selected_topics").split(",")
             q_repeat = request.form.get("q_repeat")
             everything = bool(request.form.get("everything").replace("false", ""))

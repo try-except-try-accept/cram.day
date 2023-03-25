@@ -3,6 +3,7 @@ ONE_HOUR = 3676  # 1h diff between datetime timestamps
 ONE_DAY = 86400  # 24h diff between datetime timestamps
 ONE_MIN = ONE_HOUR // 60
 ADMIN_ID = '0'
+WAIT_BEFORE_RESYNC = 60
 
 # consider gap limit in future
 
