@@ -119,22 +119,8 @@ def spreadsheet_to_query_placeholders(data):
     return all_data, all_placeholders
 
 
-def sync_data_with_db():
-    """Connects to google sheet and updates question data / answer data
-    run periodically according to quota"""
 
-    # sync spreadsheet question data with database
-    query_db("DELETE FROM questions")
-
-
-
-    try:
-        gc = gspread.service_account(filename=environ["GOOGLE_SERVICE_ACCOUNT"])
-    except:
-        gc = gspread.service_account_from_dict(loads(environ["GOOGLE_SERVICE_ACCOUNT"]))
-
-    sh = gc.open('CRAM Data Source')
-
+def sync_question_data(sh):
     fill_gaps = sh.worksheet('fill_gaps')
     data = fill_gaps.get("A2:D1000")
 
@@ -159,7 +145,24 @@ def sync_data_with_db():
     question_data = query_db("SELECT * FROM questions")
     question_data_conf = "<p>Data added:</p><table>" + "".join(["<tr>" + "".join([f"<td>{col}</td>" for col in row])+ \
                                                                 "</tr>" for row in question_data]) + "</table>"
+    
+    fill_gaps = sh.worksheet('topics')
+    data = fill_gaps.get("A2:C1000")
+    q = "INSERT OR REPLACE INTO topics (topic_id, topic_index, topic_name, topic_category) VALUES "
+    for row in data:
+        index = row[1].split(" ")[0]
+        name = " ".join(row[1].split(" ")[1:])
+        q += f'({row[0]}, "{index}", "{name}", "{row[2]}"),'
 
+
+
+    query_db(q[:-1])
+
+    return question_data_conf
+
+
+
+def sync_answer_data(sh):
     # sync database answer data with spreadsheet
     answer_data_conf = ""
 
@@ -204,19 +207,29 @@ def sync_data_with_db():
     answer_data_conf += "</ul>"
 
     ss.update(f'A1', all_answers)
-
-    fill_gaps = sh.worksheet('topics')
-    data = fill_gaps.get("A2:C1000")
-    q = "INSERT OR REPLACE INTO topics (topic_id, topic_index, topic_name, topic_category) VALUES "
-    for row in data:
-        index = row[1].split(" ")[0]
-        name = " ".join(row[1].split(" ")[1:])
-        q += f'({row[0]}, "{index}", "{name}", "{row[2]}"),'
+    return answer_data_conf
 
 
+def sync_data_with_db():
+    """Connects to google sheet and updates question data / answer data
+    run periodically according to quota"""
 
-    query_db(q[:-1])
+    # sync spreadsheet question data with database
+    query_db("DELETE FROM questions")
 
+
+
+    try:
+        gc = gspread.service_account(filename=environ["GOOGLE_SERVICE_ACCOUNT"])
+    except:
+        gc = gspread.service_account_from_dict(loads(environ["GOOGLE_SERVICE_ACCOUNT"]))
+
+    sh = gc.open('CRAM Data Source')
+
+    
+    
+    question_data_conf = sync_question_data(sh)
+    answer_data_conf = sync_answer_data(sh)
 
 
     return Markup(question_data_conf + answer_data_conf)
