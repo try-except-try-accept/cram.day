@@ -15,6 +15,7 @@ from config import GAP_HTML, DARK_MODE_COLOURS, LIGHT_MODE_COLOURS, WAIT_BEFORE_
 from waitress import serve
 import os
 from time import sleep
+from requests import get
 
 app = Flask(__name__)
 app.secret_key = uuid4().hex
