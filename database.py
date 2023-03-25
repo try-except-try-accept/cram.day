@@ -55,7 +55,7 @@ def authenticate_user(username, password):
 
 
 def get_last_n_answers(n):
-    return query_db("SELECT timestamp FROM answers ORDER BY timestamp DESC LIMIT ?", args=(n))
+    return query_db("SELECT time_stamp FROM answers ORDER BY time_stamp DESC LIMIT ?", args=(n,))
 
 def query_db(query, catch=True, args=None):
 
