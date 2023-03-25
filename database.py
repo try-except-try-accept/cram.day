@@ -13,6 +13,7 @@ from datetime import datetime
 from random import sample, shuffle, randint, choice
 from boto.s3.connection import S3Connection
 from boto.exception import NoAuthHandlerFound as BotoError
+from json import loads
 try:
     s3 = S3Connection(environ['GOOGLE_SERVICE_ACCOUNT'])
 except BotoError:
@@ -127,8 +128,10 @@ def sync_data_with_db():
 
 
 
-
-    gc = gspread.service_account(filename=environ["GOOGLE_SERVICE_ACCOUNT"])
+    try:
+        gc = gspread.service_account(filename=environ["GOOGLE_SERVICE_ACCOUNT"])
+    except:
+        gc = gspread.service_account_from_dict(loads(environ["GOOGLE_SERVICE_ACCOUNT"]))
 
     sh = gc.open('CRAM Data Source')
 
