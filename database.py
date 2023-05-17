@@ -131,7 +131,7 @@ def sync_question_data(sh):
     query_db("DELETE FROM questions")
 
     fill_gaps = sh.worksheet('fill_gaps')
-    data = fill_gaps.get("A2:D1000")
+    data = fill_gaps.get("A2:D2000")
 
     q = "INSERT INTO questions (question_id, question, gaps, topic_index) VALUES "
 
