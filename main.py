@@ -3,7 +3,7 @@ from random import choice, randrange, shuffle, sample, randint
 from uuid import uuid4
 from database import write_session_to_db, get_question_data,save_answers_to_db, read_leaderboard_from_db, \
                      get_misnomers, authenticate_user, load_user_creds, sync_data_with_db, save_settings_to_db, \
-                     get_settings_from_db, get_topic_data, load_gsheet, sync_answer_data
+                     get_settings_from_db, get_topic_data, load_gsheet, sync_answer_data, init_misnomers
 
 
 
@@ -302,6 +302,8 @@ def begin_session():
             #print("q rpeat is", q_repeat)
             #print("everything is", everything)
 
+            session['misnomers'] = init_misnomers(current_user.user_id)
+
             write_session_to_db(topics, q_repeat, everything, current_user.user_id)
 
     q = create_question()
@@ -318,9 +320,9 @@ def begin_session():
 
 @app.route("/fill_the_gaps", methods=["GET"])
 def fill_the_gaps():
-    state = session.get('state')
-    if state is None:
-        state = "main"
+
+
+
 
     if current_user.is_authenticated:
 
@@ -340,7 +342,7 @@ def fill_the_gaps():
 
         #print("eal mode is", eal)
         #print("Topic data is", session['topic_data'])
-        return render_template("fill_the_gaps.html", state=state, chart=chart, eal=eal, display_mode=display_mode,
+        return render_template("fill_the_gaps.html", chart=chart, eal=eal, display_mode=display_mode,
                                highlight=highlight, leaderboard_mode=leaderboard_mode,
                                hide_non_topic=session['hide_non_topic'], opt_out=session['opt_out'],
                                topic_data=session['topic_data'])
@@ -362,7 +364,7 @@ def get_hints():
 
             hints = session['correct']
 
-            hints = get_misnomers(hints, current_user.user_id, num_hints)
+            hints = get_misnomers(session['misnomers'], hints, current_user.user_id, num_hints)
 
             shuffle(hints)
 
@@ -379,8 +381,8 @@ def get_hints():
 
             return jsonify({"hints":final_hints, "eal_mode":eal_mode})
 
-    else:
-        return 404
+
+    return Response({'status':404})
 
 #############################################################################
 
@@ -409,7 +411,7 @@ def logout():
 
 @app.route("/", methods=["GET", "POST"])
 def home():
-    session['state'] = 'main'
+
     return redirect(url_for(("login")))
 
 
@@ -482,6 +484,7 @@ def login():
                 flash('Logged in successfully ' + username + " - now choose your topics!")
                 reload_settings(user_id)
                 session['topic_data'] = get_topic_data()
+                session['state'] = 'main'
                 return redirect(url_for('fill_the_gaps'))
             else:
                 flash('Login Unsuccessful.')

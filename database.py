@@ -353,39 +353,31 @@ def get_chart_data():
 
     return {"title":title, "data":data}
 
-def get_misnomers(correct, user_id, num_hints):
+def init_misnomers(user_id):
     q = f'''SELECT DISTINCT questions.gaps
-FROM questions, users, sessions
-WHERE users.user_id = {user_id}
-AND (users.hide_non_topic = 0
-OR 
-(sessions.in_use_flag = 1
-AND sessions.user_id = {user_id}
-AND questions.question_id = sessions.question_id))
-'''
+    FROM questions, users, sessions
+    WHERE users.user_id = {user_id}
+    AND (users.hide_non_topic = 0
+    OR 
+    (sessions.in_use_flag = 1
+    AND sessions.user_id = {user_id}
+    AND questions.question_id = sessions.question_id))
+    '''
 
     results = query_db(q)
-
-    keywords = []
-
-
-
+    misnomers = []
     for row in results:
-        keywords += [word for word in row[0].split(", ")]
-
-
-    #print(keywords)
-
-    misnomers = sample(keywords, num_hints)
-    for c in correct:
-        while c in misnomers:
-            misnomers = sample(keywords, num_hints)
-
-
-    misnomers += correct
+        misnomers += [word for word in row[0].split(", ")]
 
     shuffle(misnomers)
+    return list(sample(set(misnomers), 200))
 
+
+def get_misnomers(misnomers, correct, user_id, num_hints):
+    misnomers = set(sample(misnomers, num_hints))
+    misnomers |= set(correct)
+    misnomers = list(misnomers)
+    shuffle(misnomers)
     return misnomers
 
 
