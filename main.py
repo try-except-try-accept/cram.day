@@ -307,8 +307,10 @@ def begin_session():
     q = create_question()
     if q == 404:
         flash("No questions found.")
+        session['state'] = 'main'
         return ""
     else:
+        session['state'] = 'play'
         return q
 
 
@@ -316,6 +318,10 @@ def begin_session():
 
 @app.route("/fill_the_gaps", methods=["GET"])
 def fill_the_gaps():
+    state = session.get('state')
+    if state is None:
+        state = "main"
+
     if current_user.is_authenticated:
 
 
@@ -334,7 +340,7 @@ def fill_the_gaps():
 
         #print("eal mode is", eal)
         #print("Topic data is", session['topic_data'])
-        return render_template("fill_the_gaps.html", chart=chart, eal=eal, display_mode=display_mode,
+        return render_template("fill_the_gaps.html", state=state, chart=chart, eal=eal, display_mode=display_mode,
                                highlight=highlight, leaderboard_mode=leaderboard_mode,
                                hide_non_topic=session['hide_non_topic'], opt_out=session['opt_out'],
                                topic_data=session['topic_data'])
@@ -347,30 +353,31 @@ def fill_the_gaps():
 @app.route("/get_hints", methods=["GET"])
 def get_hints():
     if current_user.is_authenticated:
+        if session['state'] == 'play':
 
-        eal_mode = session['eal']
+            eal_mode = session['eal']
 
-        num_hints = 5 if eal_mode else 10
-
-
-        hints = session['correct']
-
-        hints = get_misnomers(hints, current_user.user_id, num_hints)
-
-        shuffle(hints)
-
-        final_hints = []
-
-        for h in hints:
-            this_hint = {}
-            this_hint['text'] = h
-            this_hint['colour'] = "#" + "".join([hex(randrange(200, 255))[2:].zfill(2) for i in range(3)])
-
-            final_hints.append(this_hint)
-            #print(final_hints)
+            num_hints = 5 if eal_mode else 10
 
 
-        return jsonify({"hints":final_hints, "eal_mode":eal_mode})
+            hints = session['correct']
+
+            hints = get_misnomers(hints, current_user.user_id, num_hints)
+
+            shuffle(hints)
+
+            final_hints = []
+
+            for h in hints:
+                this_hint = {}
+                this_hint['text'] = h
+                this_hint['colour'] = "#" + "".join([hex(randrange(200, 255))[2:].zfill(2) for i in range(3)])
+
+                final_hints.append(this_hint)
+                #print(final_hints)
+
+
+            return jsonify({"hints":final_hints, "eal_mode":eal_mode})
 
     else:
         return 404
@@ -402,6 +409,7 @@ def logout():
 
 @app.route("/", methods=["GET", "POST"])
 def home():
+    session['state'] = 'main'
     return redirect(url_for(("login")))
 
 

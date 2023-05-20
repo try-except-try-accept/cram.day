@@ -527,7 +527,7 @@ function submit_answer()
     }
 
     allow_submit = false;
-    setTimeout(reset_timer, 800);
+    setTimeout(reset_timer, 2000);
 
     kill_non_text_elems();
     let form_data = new FormData();
@@ -665,6 +665,8 @@ function begin_session()
      try { document.getElementById("quiz").removeChild(stats) } catch (e) { }
 
     document.getElementById("question").innerHTML = data;
+    document.getElementById("hint_button").disabled = false;
+    document.getElementById("check_button").disabled = false;
 
     }
     );
