@@ -370,7 +370,7 @@ def init_misnomers(user_id):
         misnomers += [word for word in row[0].split(", ")]
 
     shuffle(misnomers)
-    return list(sample(set(misnomers), 200))
+    return sample(list(set(misnomers)), 200)
 
 
 def get_misnomers(misnomers, correct, user_id, num_hints):
