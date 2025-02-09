@@ -248,7 +248,7 @@ def get_topic_data():
     results = query_db(q)
     #print(results)
     topic_data = {}
-    for index, topic in zip([1,2,3,4,5], ["a2", "as", "igcse", "ks3", "pp"]):
+    for index, topic in zip([1,2,3,4,5,6], ["a2", "as", "igcse", "ks3", "pp", "aqa_a2"]):
         topic_data[index] = Markup(",".join([f'"{row[0]} {row[1]}"' for row in results if row[2] == index]))
 
     #print(topic_data)

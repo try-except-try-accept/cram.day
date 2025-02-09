@@ -12,8 +12,10 @@
         AS_TOPICS = [{{ topic_data['2'] }}]
         KS3_TOPICS = [{{ topic_data['4'] }}]
         BASIC_PYTHON_PRINCIPLES = [{{ topic_data['5'] }}]
+        AQA_A2_TOPICS = [{{ topic_data['6'] }}]
 
         EVERYTHING = []
+        EVERYTHING.concat(AQA_A2_TOPICS)
         EVERYTHING.concat(A2_TOPICS)
         EVERYTHING.concat(AS_TOPICS)
         EVERYTHING.concat(IGCSE_TOPICS)
@@ -71,6 +73,7 @@
         body, .modal-content { background-color:#0d1117; color:#c9d1d9 }
         input { background-color:#0d1109; color:#c9d1d9 }
         code { color:#58a6ff; }
+        .hint { color:#010001; }
 
         {% elif display_mode == 2 %}
 
