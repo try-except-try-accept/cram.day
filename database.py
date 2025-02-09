@@ -1,7 +1,8 @@
 import gspread
 import sqlite3
 from config import *
-from flask import flash, Markup
+from flask import flash
+from markupsafe import Markup
 from os import environ
 # db plan
 ###############################
@@ -11,13 +12,9 @@ from os import environ
 # daemon/periodic update -> server updates questions table based on gspread
 from datetime import datetime
 from random import sample, shuffle, randint, choice
-from boto.s3.connection import S3Connection
-from boto.exception import NoAuthHandlerFound as BotoError
+
 from json import loads
-try:
-    s3 = S3Connection(environ['GOOGLE_SERVICE_ACCOUNT'])
-except BotoError:
-    print("Assume running locally")
+
 
 def load_user_creds(user_id=None, username=None):
     if username:
@@ -226,7 +223,7 @@ def load_gsheet():
     except:
         gc = gspread.service_account_from_dict(loads(environ["GOOGLE_SERVICE_ACCOUNT"]))
 
-    return gc.open('CRAM Data Source')
+    return gc.open('Copy of CRAM Data Source')
 
 
 

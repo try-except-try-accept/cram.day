@@ -1,5 +1,5 @@
 
-from flask import Markup
+from markupsafe import Markup
 from database import get_chart_data
 from random import randint
 

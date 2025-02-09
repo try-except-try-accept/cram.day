@@ -1,4 +1,5 @@
-from flask import Flask, session, url_for, render_template, request, Markup, jsonify, redirect, flash, Response
+from flask import Flask, session, url_for, render_template, request, jsonify, redirect, flash, Response
+from markupsafe import Markup
 from random import choice, randrange, shuffle, sample, randint
 from uuid import uuid4
 from database import write_session_to_db, get_question_data,save_answers_to_db, read_leaderboard_from_db, \
